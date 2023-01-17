@@ -462,8 +462,9 @@ static report_mouse_t process_pointing_mode(pointing_mode_t pointing_mode, repor
 #    ifdef MOUSE_SCROLL_HIRES_ENABLE
             {
                 uint8_t cur_divisor = pointing_mode.divisor;
-                uint8_t drag_multiplier = MAX(MOUSE_SCROLL_MULTIPLIER / cur_divisor, 1);
-                if (RESOLUTION_MULTIPLIER_H) {
+                if (IS_HIRES_H_ACTIVE) {
+                    int16_t drag_multiplier = MOUSE_SCROLL_MULTIPLIER_H / cur_divisor;
+                    if(!(drag_multiplier >> 1)) drag_multiplier |= 0x0001;
                     pointing_mode.x *= drag_multiplier;
                     pointing_mode.divisor = 1;
                 }
@@ -475,7 +476,9 @@ static report_mouse_t process_pointing_mode(pointing_mode_t pointing_mode, repor
             pointing_mode_divisor_override(POINTING_DRAG_DIVISOR_V);
 #    endif
 #    ifdef MOUSE_SCROLL_HIRES_ENABLE
-                if (RESOLUTION_MULTIPLIER_V) {
+                if (IS_HIRES_V_ACTIVE) {
+                    int16_t drag_multiplier = MOUSE_SCROLL_MULTIPLIER_V / cur_divisor;
+                    if(!(drag_multiplier >> 1)) drag_multiplier |= 0x0001;
                     pointing_mode.y *= drag_multiplier;
                     pointing_mode.divisor = 1;
                 } else {
