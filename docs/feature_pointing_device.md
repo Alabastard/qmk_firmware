@@ -1005,12 +1005,12 @@ For most keycode tapping modes a divisor of `64` works well, which is the defaul
 #### Callbacks to set pointing device mode divisors
 The following callbacks can be used to overwrite built in mode divisors or to set divisors for new modes. The `get_pointing_mode_divisor` stacks works by checking the functions until a non zero value is reached in order of `user`->`kb`->`built in`->`default_value`.  Returning a divisor of `0` will allow processing to continue on to the next stage, However this means that if any of the get divisor callback functions return a default value other than 0 then that will overwrite all subsequent divisors(such as built in modes).  These functions allows for overriding and modifying built in divisors by users/keymaps and keyboards and overriding keyboard level divisors by users/keymaps so it is possible to give built in modes the same level of divisor customization as new custom modes.
 
-| Callback                                                                              | Description                                                               |
-| ------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
-| `uint8_t get_pointing_mode_divisor_kb(uint8_t mode_id, uint8_t direction);`           | Keyboard level callback for setting divisor based on mode id an direction |
-| `uint8_t get_pointing_mode_divisor_user(uint8_t mode_id, uint8_t direction);`         | Keymap/user level callback for setting divisor                            |
-| `uint8_t pointing_mode_divisor_postprocess_kb(uint8_t mode_id, uint8_t direction);`   | keyboard level callback for modifying all divisors before being updated   |
-| `uint8_t pointing_mode_divisor_postprocess_user(uint8_t mode_id, uint8_t direction);` | Keymap/user level callback for modifying all divisors                     |
+| Callback                                                                              | Description                                                                                                                                            |
+| ------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `uint8_t get_pointing_mode_divisor_kb(uint8_t mode_id, uint8_t direction);`           | Keyboard level callback for setting divisor based on mode id an direction                                                                              |
+| `uint8_t get_pointing_mode_divisor_user(uint8_t mode_id, uint8_t direction);`         | Keymap/user level callback for setting divisor                                                                                                         |
+| `bool pointing_mode_divisor_postprocess_kb(uint8_t mode_id, uint8_t direction);`      | keyboard level callback for modifying all divisors after above callbacks before it is applied (_return `false` to skip subsequent post_processing_)    |
+| `bool pointing_mode_divisor_postprocess_user(uint8_t mode_id, uint8_t direction);`    | Keymap/user level callback for modifying all divisors after above callbacks before it is applied (_return `false` to skip subsequent post_processing_) |
  
 #### Example code of assigning divisors for new modes
 ```c
@@ -1103,10 +1103,10 @@ The above alternative method uses a `uint8_t` variable that defaults to zero tha
 
 There are built in functions to simplify the creation of custom keycodes and it is generally recommended to use these in combination with other functions rather than using mode changing functions as they do handle some edge cases to ensure consistent behaviour.
 
-| Function                                                                                    | Description                                                                                     | Return type |
-| :------------------------------------------------------------------------------------------ | :---------------------------------------------------------------------------------------------- | :---------: |
-| `pointing_mode_key_momentary(uint8_t mode_id, keyrecord_t* record)`                         | Momentary change of pointing mode while key is held (_for use in custom keycodes_)              |   _None_    |
-| `pointing_mode_key_toggle(uint8_t mode_id, keyrecord_t* record)`                            | Toggle pointing mode on/off on key release (_for use in custom keycodes_)                       |   _None_    |
+| Function                                                                       | Description                                                                                                                | Return type |
+| :----------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------- | :---------: |
+| `pointing_mode_key_momentary(uint8_t mode_id, bool pressed)`                   | Momentary change of pointing mode while key is held (_for use in custom keycodes pass `record->event.pressed` for `bool`_) |   _None_    |
+| `pointing_mode_key_toggle(uint8_t mode_id, bool pressed)`                      | Toggle pointing mode on/off on key release (_for use in custom keycodes pass `record->event.pressed` for `bool`_)          |   _None_    |
 
 These can be used to activate pointing device modes outside of the range of the built in keycodes as well as adding custom features to a mode that activate on key press such as registering a keycode and holding it until key release (_see code examples below_).
 
@@ -1256,12 +1256,11 @@ There are several functions available to assist with the creation of custom mode
 | `set_pointing_mode(pointing_mode_t pointing_mode)`                                          | Set stored pointing mode state to `pointing_mode`                                               |    _None_    |
 | `pointing_mode_update(void)`                                                                | Update stored direction and divisor based on current mode id and h/v values                     |    _None_    |
 | `pointing_tap_codes(uint16_t kc_left, uint16_t kc_down, uint16_t kc_up, uint16_t kc_right)` | Convert stored h/v axis value to key taps depending on direction, 1 key tap per current divisor |    _None_    |
-| `apply_divisor_xy(int16_t value)`                                                           | divides value by the current divisor clamped to mouse cursor output                             | `mouse_xy_t` |
-| `apply_divisor_hv(int16_t value)`                                                           | divides value by the current divisor clamped to mouse scroll output                             |   `int8_t`   |
-| `multiply_divisor_xy(mouse_xy_report_t value)`                                              | multiplies cursor value by the current divisor clamped to `int16_t` (_to collect the residual_) |   `int16_t`  |
-| `multiply_divisor_hv(int8_t value)`                                                         | multiplies scroll value by the current divisor clamped to `int16_t` (_to collect the residual_) |   `int16_t`  |
-| `multiply_divisor_hv(int8_t value)`                                                         | multiplies scroll value by the current divisor clamped to `int16_t` (_to collect the residual_) |   `int16_t`  |
-  
+| `apply_divisor_xy(int16_t value)`                                                           | Divides value by the current divisor clamped to mouse cursor output                             | `mouse_xy_t` |
+| `apply_divisor_hv(int16_t value)`                                                           | Divides value by the current divisor clamped to mouse scroll output                             |   `int8_t`   |
+| `multiply_divisor_xy(mouse_xy_report_t value)`                                              | Multiplies cursor value by the current divisor clamped to `int16_t` (_to collect the residual_) |   `int16_t`  |
+| `multiply_divisor_hv(int8_t value)`                                                         | Multiplies scroll value by the current divisor clamped to `int16_t` (_to collect the residual_) |   `int16_t`  |
+| `pointing_mode_divisor_override(uint8_t divisor)`                                           | Override current pointing mode divisor and still apply post processing for divisors             |    _None_    |
      
 #### Creating modes using callback functions:
 ```c

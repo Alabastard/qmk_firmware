@@ -54,17 +54,15 @@ static inline int16_t clamp_int_32_to_16(int32_t value) {
     }
 }
 
-static inline int16_t divisor_multiply16(int16_t value) {
+static int16_t divisor_multiply16(int16_t value) {
 #    ifdef POINTING_DEVICE_MODES_FASTCALC
     return clamp_int_32_to_16(value << pointing_mode_context.mode.divisor);
 #    else
     return clamp_int_32_to_16(value * (int16_t)pointing_mode_context.mode.divisor);
 #    endif
-
-    return clamp_int_32_to_16(value * (int16_t)pointing_mode_context.mode.divisor);
 }
 
-static inline int8_t divisor_divide8(int16_t value) {
+static int8_t divisor_divide8(int16_t value) {
 #    ifdef POINTING_DEVICE_MODES_FASTCALC
     return clamp_int_16_to_8(value >> pointing_mode_context.mode.divisor);
 #    else
@@ -72,20 +70,12 @@ static inline int8_t divisor_divide8(int16_t value) {
 #    endif
 }
 
-static inline int16_t divisor_divide16(int16_t value) {
+static int16_t divisor_divide16(int16_t value) {
 #    ifdef POINTING_DEVICE_MODES_FASTCALC
     return value >> pointing_mode_context.mode.divisor;
 #    else
     return value / (int16_t)pointing_mode_context.mode.divisor;
 #    endif
-}
-
-static inline int8_t apply_divisor_count(int16_t value) {
-    return divisor_divide8(value);
-}
-
-static inline int16_t multiply_divisor_count(int8_t value) {
-    return divisor_multiply16((int16_t)value);
 }
 
 /**
@@ -133,7 +123,6 @@ void set_pointing_mode(pointing_mode_t pointing_mode) {
     // skip if same
     if (!memcmp(&pointing_mode_context.mode, &pointing_mode, sizeof(pointing_mode_t))) return;
     memcpy(&pointing_mode_context.mode, &pointing_mode, sizeof(pointing_mode_t));
-    dprintf("PM status saved!");
     // Prevent zero divisor
     if (!pointing_mode_context.mode.divisor) {
         pointing_mode_context.mode.divisor = POINTING_DEFAULT_DIVISOR;
@@ -223,8 +212,13 @@ __attribute__((weak)) report_mouse_t pointing_modes_axes_conv(pointing_mode_t po
  * @return divisor uint8_t
  */
 static uint8_t divisor_postprocess(uint8_t divisor) {
-    divisor = pointing_mode_divisor_postprocess_kb(divisor);
-    divisor = pointing_mode_divisor_postprocess_user(divisor);
+    if (!(pointing_mode_divisor_postprocess_kb(&divisor) && pointing_mode_divisor_postprocess_user(&divisor))) {
+#    ifdef POINTING_DEVICE_MODES_FASTCALC
+        return biton(divisor);
+#    else
+        return divisor;
+#    endif
+    }
     // Modify divisor if precision is toggled
     if (get_toggled_pointing_mode_id() == PM_PRECISION && !(get_pointing_mode_id() == PM_PRECISION)) {
         divisor = ((uint16_t)divisor * POINTING_PRECISION_DIVISOR) > UINT8_MAX ? UINT8_MAX : (divisor * POINTING_PRECISION_DIVISOR);
@@ -394,15 +388,15 @@ void pointing_tap_codes(uint16_t kc_left, uint16_t kc_down, uint16_t kc_up, uint
 
     switch (pointing_mode_context.mode.direction) {
         case PD_DOWN ... PD_UP:
-            count = apply_divisor_count(pointing_mode_context.mode.y);
+            count = divisor_divide8(pointing_mode_context.mode.y);
             if (!count) return;
-            pointing_mode_context.mode.y -= multiply_divisor_count(count);
+            pointing_mode_context.mode.y -= divisor_multiply16(count);
             pointing_mode_context.mode.x = 0;
             break;
         case PD_LEFT ... PD_RIGHT:
-            count = apply_divisor_count(pointing_mode_context.mode.x);
+            count = divisor_divide8(pointing_mode_context.mode.x);
             if (!count) return;
-            pointing_mode_context.mode.x -= multiply_divisor_count(count);
+            pointing_mode_context.mode.x -= divisor_multiply16(count);
             pointing_mode_context.mode.y = 0;
             break;
     }
@@ -516,14 +510,14 @@ static report_mouse_t process_pointing_mode(pointing_mode_t pointing_mode, repor
  * NOTE: if pointing mode has changed since key down, reset is skipped
  *
  * @params mode_id[in] uint8_t
- * @params record[in] keyrecord_t* pointer
+ * @params pressed[in] bool
  */
-void pointing_mode_key_momentary(uint8_t mode_id, keyrecord_t* record) {
-    if (record->event.pressed) {
+void pointing_mode_key_momentary(uint8_t mode_id, bool pressed) {
+    if (pressed) {
         set_pointing_mode_id(mode_id);
-    } else {
+    } else if (pointing_mode_context.mode.id == mode_id) {
         // reset mode only if the current mode matches (in case mode has changed before release)
-        if (pointing_mode_context.mode.id == mode_id) pointing_mode_reset();
+        pointing_mode_reset();
     }
 }
 
@@ -535,9 +529,9 @@ void pointing_mode_key_momentary(uint8_t mode_id, keyrecord_t* record) {
  * @params mode_id[in] uint8_t
  * @params record[in] keyrecord_t* pointer
  */
-void pointing_mode_key_toggle(uint8_t mode_id, keyrecord_t* record) {
+void pointing_mode_key_toggle(uint8_t mode_id, bool pressed) {
     // only attempt to change mode on key release event (matches layer toggle behaviour)
-    if (!record->event.pressed) toggle_pointing_mode_id(mode_id);
+    if (!pressed) toggle_pointing_mode_id(mode_id);
 }
 
 /**
@@ -555,11 +549,11 @@ bool process_pointing_mode_records(uint16_t keycode, keyrecord_t* record) {
         // handle built in keycods for bottom 16 pointing modes (0-15)
         // momentary
         case POINTING_MODE_MO ... POINTING_MODE_MO_MAX:
-            pointing_mode_key_momentary((keycode - POINTING_MODE_MO) & (POINTING_MODE_COUNT - 1), record);
+            pointing_mode_key_momentary((keycode - POINTING_MODE_MO) & (POINTING_MODE_COUNT - 1), record->event.pressed);
             return true; // allow further processing
         // toggle
         case POINTING_MODE_TG ... POINTING_MODE_TG_MAX:
-            pointing_mode_key_toggle((keycode - POINTING_MODE_TG) & (POINTING_MODE_COUNT - 1), record);
+            pointing_mode_key_toggle((keycode - POINTING_MODE_TG) & (POINTING_MODE_COUNT - 1), record->event.pressed);
             return true; // allow further processing
         // end
         default:
@@ -641,10 +635,10 @@ __attribute__((weak)) uint8_t get_pointing_mode_divisor_kb(uint8_t mode_id, uint
  *
  * @params[in] divisor uint8_t
  *
- * @return divisor uint8_t
+ * @return continue process? bool
  */
-__attribute__((weak)) uint8_t pointing_mode_divisor_postprocess_kb(uint8_t divisor) {
-    return divisor;
+__attribute__((weak)) bool pointing_mode_divisor_postprocess_kb(uint8_t* divisor) {
+    return true;
 }
 
 /**
@@ -656,10 +650,10 @@ __attribute__((weak)) uint8_t pointing_mode_divisor_postprocess_kb(uint8_t divis
  * @params pointing_mode[in] uint8_t
  * @params direction[in] uint8_t
  *
- * @return divisor uint8_t
+ * @return continue process? bool
  */
-__attribute__((weak)) uint8_t pointing_mode_divisor_postprocess_user(uint8_t divisor) {
-    return divisor;
+__attribute__((weak)) bool pointing_mode_divisor_postprocess_user(uint8_t* divisor) {
+    return true;
 }
 
 #    if defined(SPLIT_POINTING_ENABLE) && defined(POINTING_DEVICE_COMBINED)

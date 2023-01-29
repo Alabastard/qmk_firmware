@@ -123,8 +123,8 @@ uint8_t get_toggled_pointing_mode_id(void);       // return current tg_mode_id
 report_mouse_t pointing_modes_axes_conv(pointing_mode_t pointing_mode, report_mouse_t mouse_report); // converts x & y axes to local h & v
 
 /* ----------Setting up pointing mode custom keyrecords----------------------------------------------------------- */
-void pointing_mode_key_momentary(uint8_t mode_id, keyrecord_t* record); // momentary change of pointing mode while button is held
-void pointing_mode_key_toggle(uint8_t mode_id, keyrecord_t* record);    // toggle pointing mode on/off on keypress
+void pointing_mode_key_momentary(uint8_t mode_id, bool pressed); // momentary change of pointing mode while button is held
+void pointing_mode_key_toggle(uint8_t mode_id, bool pressed);    // toggle pointing mode on/off on keypress
 
 /* ----------For custom pointing modes---------------------------------------------------------------------------- */
 void              set_pointing_mode(pointing_mode_t pointing_mode);                                          // overwrite local pointing_mode status
@@ -148,8 +148,8 @@ bool process_pointing_mode_user(pointing_mode_t pointing_mode, report_mouse_t* m
 /* ----------Callbacks for adding/modifying pointing device mode divisors----------------------------------------- */
 uint8_t get_pointing_mode_divisor_kb(uint8_t mode_id, uint8_t direction);   // adding divisors at keyboard level
 uint8_t get_pointing_mode_divisor_user(uint8_t mode_id, uint8_t direction); // adding divisors at user/keymap level
-uint8_t pointing_mode_divisor_postprocess_kb(uint8_t divisor);              // modifying divisors at keyboard level
-uint8_t pointing_mode_divisor_postprocess_user(uint8_t divisor);            // modifying divisors at user/keymap level
+bool    pointing_mode_divisor_postprocess_kb(uint8_t* divisor);             // modifying divisors at keyboard level
+bool    pointing_mode_divisor_postprocess_user(uint8_t* divisor);           // modifying divisors at user/keymap level
 void    pointing_mode_divisor_override(uint8_t divisor);                    // Override current divisor until next update
 
 /* ----------Core functions (only used in custom pointing devices or key processing)------------------------------ */
