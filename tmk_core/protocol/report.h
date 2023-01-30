@@ -381,11 +381,12 @@ extern report_mouse_scroll_res_t mouse_scroll_res_report;
 bool set_hires_scroll_multiplier(uint8_t axis, uint8_t value);
 void resolution_multiplier_reset(void);
 
-#    define MOUSE_SCROLL_MULTIPLIER_RESOLUTION 8
-#    define MULTIPLIER_CONVERSION(value) (uint8_t)(((((uint16_t)value * (uint16_t)0x80) >> 8) >> 2) & 0x0F)
-#    define MOUSE_SCROLL_MULTIPLIER_RAW (mouse_scroll_res_report.data)
+#    define MOUSE_SCROLL_MULTIPLIER_RAW_FULL (mouse_scroll_res_report.data)
 #    define MOUSE_SCROLL_MULTIPLIER_RAW_V (mouse_scroll_res_report.multiplier.v)
 #    define MOUSE_SCROLL_MULTIPLIER_RAW_H (mouse_scroll_res_report.multiplier.h)
+//   The following assumes a Max multiplier of 120 and logical max of 15 for each multiplier in HID descriptor
+#    define MOUSE_SCROLL_MULTIPLIER_RESOLUTION 8
+#    define MULTIPLIER_CONVERSION(value) (uint8_t)(value >> 3)
 #    define MOUSE_SCROLL_MULTIPLIER_V (uint8_t)(MAX(mouse_scroll_res_report.multiplier.v * MOUSE_SCROLL_MULTIPLIER_RESOLUTION, 1))
 #    define MOUSE_SCROLL_MULTIPLIER_H (uint8_t)(MAX(mouse_scroll_res_report.multiplier.h * MOUSE_SCROLL_MULTIPLIER_RESOLUTION, 1))
 #endif

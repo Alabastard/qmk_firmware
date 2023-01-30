@@ -58,6 +58,14 @@ static int16_t divisor_multiply16(int16_t value) {
     return clamp_int_32_to_16(value * (int16_t)pointing_mode_context.mode.divisor);
 }
 
+static int8_t divisor_multiply8(int16_t value) {
+#    ifdef POINTING_DEVICE_MODES_FASTCALC
+    return clamp_int_16_to_8(value << pointing_mode_context.mode.divisor);
+#    else
+    return clamp_int_16_to_8(value * (int16_t)pointing_mode_context.mode.divisor);
+#    endif
+}
+
 static int8_t divisor_divide8(int16_t value) {
     return clamp_int_16_to_8(value / (int16_t)pointing_mode_context.mode.divisor);
 }
@@ -377,13 +385,13 @@ void pointing_tap_codes(uint16_t kc_left, uint16_t kc_down, uint16_t kc_up, uint
         case PD_DOWN ... PD_UP:
             count = divisor_divide16(pointing_mode_context.mode.y);
             if (!count) return;
-            pointing_mode_context.mode.y -= divisor_multiply16(count);
+            pointing_mode_context.mode.y -= divisor_multiply8(count);
             pointing_mode_context.mode.x = 0;
             break;
         case PD_LEFT ... PD_RIGHT:
             count = divisor_divide16(pointing_mode_context.mode.x);
             if (!count) return;
-            pointing_mode_context.mode.x -= divisor_multiply16(count);
+            pointing_mode_context.mode.x -= divisor_multiply8(count);
             pointing_mode_context.mode.y = 0;
             break;
     }
@@ -461,7 +469,7 @@ static report_mouse_t process_pointing_mode(pointing_mode_t pointing_mode, repor
         case PM_DRAG:
 #    ifdef MOUSE_SCROLL_HIRES_ENABLE
             if (MOUSE_SCROLL_MULTIPLIER_RAW_H) {
-                uint8_t drag_multiplier = MAX(apply_divisor_count(MOUSE_SCROLL_MULTIPLIER_H), 1);
+                uint8_t drag_multiplier = MAX(divisor_divide8(MOUSE_SCROLL_MULTIPLIER_H), 1);
                 pointing_mode.x *= (int16_t)drag_multiplier;
                 pointing_mode_divisor_override(1);
             }
@@ -473,7 +481,7 @@ static report_mouse_t process_pointing_mode(pointing_mode_t pointing_mode, repor
 #    endif
 #    ifdef MOUSE_SCROLL_HIRES_ENABLE
             if (MOUSE_SCROLL_MULTIPLIER_RAW_V) {
-                uint8_t drag_multiplier = MAX(apply_divisor_count(MOUSE_SCROLL_MULTIPLIER_V), 1);
+                uint8_t drag_multiplier = divisor_divide8(MOUSE_SCROLL_MULTIPLIER_V);
                 pointing_mode.y *= (int16_t)drag_multiplier;
                 pointing_mode_divisor_override(1);
             }

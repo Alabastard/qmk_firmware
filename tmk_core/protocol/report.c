@@ -321,8 +321,9 @@ bool set_hires_scroll_multiplier(uint8_t axis, uint8_t value) {
             break;
 
         case HIRES_BOTH:
-            mouse_scroll_res_report.multiplier.v = set_value;
-            mouse_scroll_res_report.multiplier.h = set_value;
+            mouse_scroll_res_report.data = (set_value << 4) | set_value;
+            //mouse_scroll_res_report.multiplier.v = set_value;
+            //mouse_scroll_res_report.multiplier.h = set_value;
     }
     mouse_scroll_res_report.data &= max_multiplier;
     return mouse_scroll_res_report.data != multiplier_temp;

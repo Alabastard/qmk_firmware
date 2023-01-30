@@ -349,13 +349,13 @@ Scrolling sensitivity will need to be adjusted based on the current resolution m
 The resolution multiplier data is a single byte with with 4 bits dedicated to each axis with the 4 least significant bits dedicated to the vertical axis and the 4 most significant bits dedicated to the horizontal axis. This value is originally set during usb initialization and can be changed during runtime.
 
 ### Useful C Macros for High Resolution Scrolling
-| C Macro                                        | Description                                                                                             |  Value Range   | data type     |
-| ---------------------------------------------- | --------------------------------------------------------------------------------------------------------| -------------- | :-----------: |
-| `IS_SCROLL_MULTIPLIER_RAW`                     | Raw scroll multiplier value for both axes                                                               | `0x00 - 0xFF`  |   `uint8_t`   |
-| `IS_SCROLL_MULTIPLIER_RAW_H`                   | Raw **vertical** scroll multiplier value (_only uses 4 bits_)                                           | `0x00 - 0x0F`  |   `uint8_t`   |
-| `IS_SCROLL_MULTIPLIER_RAW_V`                   | Raw **horizontal** scroll multiplier value (_only uses 4 bits_)                                         | `0x00 - 0x0F`  |   `uint8_t`   |
-| `MOUSE_SCROLL_MULTIPLIER_V`                    | Current scroll multiplier for the **vertical** axis  (_slower than accessing raw data_)                 | `1-120`        |   `uint8_t`   |
-| `MOUSE_SCROLL_MULTIPLIER_H`                    | Current scroll multiplier for the **horizontal** axis (_slower than accessing raw data_)                | `1-120`        |   `uint8_t`   |
+| C Macro                                        | Description                                                                                                                |  Value Range   | data type     |
+| ---------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------| -------------- | :-----------: |
+| `MOUSE_SCROLL_MULTIPLIER_RAW_FULL`             | Raw full scroll multiplier value for both axes (_Least significant bits -> vertical, Most significant bits -> horizontal_) | `0x00 - 0xFF`  |   `uint8_t`   |
+| `MOUSE_SCROLL_MULTIPLIER_RAW_H`                | Raw **vertical** scroll multiplier value (_only uses 4 bits_)                                                              | `0x00 - 0x0F`  |   `uint8_t`   |
+| `MOUSE_SCROLL_MULTIPLIER_RAW_V`                | Raw **horizontal** scroll multiplier value (_only uses 4 bits_)                                                            | `0x00 - 0x0F`  |   `uint8_t`   |
+| `MOUSE_SCROLL_MULTIPLIER_V`                    | Current scroll multiplier for the **vertical** axis  (_slower than accessing raw data_)                                    | `1-120`        |   `uint8_t`   |
+| `MOUSE_SCROLL_MULTIPLIER_H`                    | Current scroll multiplier for the **horizontal** axis (_slower than accessing raw data_)                                   | `1-120`        |   `uint8_t`   |
 
 ### Useful functions for High Resolution Scrolling
 | Function                                                   | Description                                                                                                | Result type    |
