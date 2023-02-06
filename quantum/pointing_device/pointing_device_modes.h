@@ -63,7 +63,7 @@
 #    define POINTING_PRECISION_DIVISOR 2
 #endif
 #ifndef POINTING_DRAG_DIVISOR
-#    define POINTING_DRAG_DIVISOR 4
+#    define POINTING_DRAG_DIVISOR 16
 #endif
 #ifndef POINTING_DRAG_DIVISOR_H
 #    define POINTING_DRAG_DIVISOR_H POINTING_DRAG_DIVISOR
@@ -162,8 +162,9 @@ bool           process_pointing_mode_records(uint16_t keyrecord, keyrecord_t* re
 #else
 #    define POINTING_MODE_LAYOUT(Y_POS, X_NEG, X_POS, Y_NEG) \
         { X_NEG, Y_NEG, Y_POS, X_POS }
+#    define POINTING_MODE_MAP_START PM_SAFE_RANGE
 
-extern const uint16_t pointing_device_mode_maps[][4];
+extern const uint16_t PROGMEM pointing_device_mode_maps[][4];
 
 #    define POINTING_MODE_MAP(pm) pointing_device_mode_maps[pm][0], pointing_device_mode_maps[pm][1], pointing_device_mode_maps[pm][2], pointing_device_mode_maps[pm][3]
 #endif // POINTING_MODE_MAP_COUNT > 0
