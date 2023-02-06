@@ -200,10 +200,7 @@ __attribute__((weak)) report_mouse_t pointing_modes_axes_conv(pointing_mode_t po
  * @return divisor uint8_t
  */
 static uint8_t divisor_postprocess(uint8_t divisor) {
-    if (!(
-        pointing_mode_divisor_postprocess_user(&divisor) &&
-        pointing_mode_divisor_postprocess_kb(&divisor)
-    )) {
+    if (!(pointing_mode_divisor_postprocess_user(&divisor) && pointing_mode_divisor_postprocess_kb(&divisor))) {
         return divisor;
     }
     // Modify divisor if precision is toggled
@@ -323,7 +320,6 @@ int16_t multiply_divisor_xy(mouse_xy_report_t value) {
     return divisor_multiply16((int16_t)value);
 }
 
-
 /**
  * @brief multiplies mouse h/v value by current divisor
  *
@@ -394,7 +390,7 @@ void pointing_tap_codes(uint16_t kc_left, uint16_t kc_down, uint16_t kc_up, uint
     uint8_t taps = abs(count);
     do {
         tap_code16_delay(kc_direction, POINTING_TAP_DELAY);
-    } while(--taps);
+    } while (--taps);
 }
 
 /**
@@ -426,11 +422,8 @@ report_mouse_t pointing_device_modes_task(report_mouse_t mouse_report) {
  * @return mouse_report report_mouse_t
  */
 static report_mouse_t process_pointing_mode(pointing_mode_t pointing_mode, report_mouse_t mouse_report) {
-    // allow overwrite of pointing modes by user, and kb 
-    if (!(
-        process_pointing_mode_user(pointing_mode, &mouse_report) &&
-        process_pointing_mode_kb(pointing_mode, &mouse_report))
-    ) {
+    // allow overwrite of pointing modes by user, and kb
+    if (!(process_pointing_mode_user(pointing_mode, &mouse_report) && process_pointing_mode_kb(pointing_mode, &mouse_report))) {
         return mouse_report;
     }
     // allow overwrite of modes using maps
@@ -558,7 +551,7 @@ bool process_pointing_mode_records(uint16_t keycode, keyrecord_t* record) {
  *
  * Takes pointing_mode_t struct, and pointer to the report_mouse_t struct used in pointing mode process allowing
  * modification of mouse_report directly and pointing mode using set_pointing_mode(pointing_mode) and the returned
- * bool controls the continued processing of pointing modes. 
+ * bool controls the continued processing of pointing modes.
  *
  * NOTE: returning false will stop mode processing (for overwriting modes)
  *
@@ -576,7 +569,7 @@ __attribute__((weak)) bool process_pointing_mode_user(pointing_mode_t pointing_m
  *
  * Takes pointing_mode_t struct, and pointer to the report_mouse_t struct used in pointing mode process allowing
  * modification of mouse_report directly and pointing mode using set_pointing_mode(pointing_mode) and the returned
- * bool controls the continued processing of pointing modes. 
+ * bool controls the continued processing of pointing modes.
  *
  * NOTE: returning false will stop mode processing (for overwriting modes)
  *
