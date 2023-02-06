@@ -234,7 +234,7 @@ enum pointing_device_mode_list {
     PM_CARET,
     PM_HISTORY,
     PM_VOLUME,
-    // safe range for custom modes with built in keycodes
+// safe range for custom modes with built in keycodes
 #ifndef EXTRAKEY_ENABLE
     PM_SAFE_RANGE = PM_VOLUME,
 #else
