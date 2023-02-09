@@ -457,13 +457,8 @@ static report_mouse_t process_pointing_mode(pointing_mode_t pointing_mode, repor
         case PM_DRAG:
             mouse_report.h = apply_divisor_hv(pointing_mode.x);
             pointing_mode.x -= multiply_divisor_hv(mouse_report.h);
-
-#    if (POINTING_DRAG_DIVISOR_V != POINTING_DRAG_DIVISOR_H)
-            pointing_mode_divisor_override(POINTING_DRAG_DIVISOR_V);
-#    endif
             mouse_report.v = apply_divisor_hv(pointing_mode.y);
             pointing_mode.y -= multiply_divisor_hv(mouse_report.v);
-
             set_pointing_mode(pointing_mode);
             break;
 

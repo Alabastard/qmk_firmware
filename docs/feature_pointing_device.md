@@ -903,8 +903,6 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 | `POINTING_CARET_DIVISOR_H`       | (optional) y input per up/down tap in `PM_CARET`(_overrides_ `POINTING_CARET_DIVISOR`)             | `1-255` |   `(x)/tap`  |       `POINTING_CARET_DIVISOR` |
 | `POINTING_PRECISION_DIVISOR`     | (optional) Pointing device x/y movement per output x/y in `PM_PRECISION` mode                      | `1-255` | `(x\|y)/dot` |                            `2` |
 | `POINTING_DRAG_DIVISOR`          | (optional) Pointing device x/y movement per h/v axis tick in `PM_DRAG` mode                        | `1-255` | `(x\|y)/dot` |                            `4` |
-| `POINTING_DRAG_DIVISOR_V`        | (optional) y input per v axis tick in `PM_DRAG`(_overrides_ `POINTING_DRAG_DIVISOR`)               | `1-255` |   `(y)/dot`  |        `POINTING_DRAG_DIVISOR` |
-| `POINTING_DRAG_DIVISOR_H`        | (optional) x input per h axis tick in `PM_DRAG`(_overrides_ `POINTING_DRAG_DIVISOR`)               | `1-255` |   `(x)/dot`  |        `POINTING_DRAG_DIVISOR` |
 
 !> For processors without hardware supported integer division (Atmel AVR U4, U2, ARM Cortex M0, M0+, M1, and, M2 chips, with the exception of the RP2040[dual Cortex M0+] which has additional hardware for it) it is generally recommended that powers of 2 are used for divisors (_i.e. 1, 2, 4, 8, 16, 32, 64, 128_) as it will usually optimize better, but **any positive integer of 255 or less** can work but can be slow on chips without hardware division.
 
@@ -915,8 +913,8 @@ Speed and sensitivity of any mode will be impacted by the pointing device CPI se
 The `POINTING_DRAG_DIVISOR` default value of 16 is based on having mouse settings in the OS set to three lines per tick of "mouse wheel" or "wheel tilt" (_Windows Default_)
 
 !> `POINTING_PRECISION_DIVISOR` default will half cursor speed when active (_divisor of 2_) but a divisor of 4 is fine to use as well but the cursor will be quite a bit slower, however divisors of 8 or greater will likely only work well for very high cpi settings.
-  
-6. Recommended settings for `POINTING_CARET_DIVISOR_V` and `POINTING_CARET_DIVISOR_H` will give faster horizontal caret movement than vertical and will give even more stability to keeping movement horizontal.
+
+Recommended settings for `POINTING_CARET_DIVISOR_V` and `POINTING_CARET_DIVISOR_H` are `16` and `32` respectively which will give preference to horizontal caret movement (`KC_LEFT`, `KC_RIGHT`) over vertical (`KC_UP`, `KC_DOWN`) giving even more stability to horizontal movement (_reducing errant up and down movement_).
 
 ### Basic Custom Modes
 There are a couple of ways to add new pointing device modes, using the pointing device mode maps will be covered here under basic use where the other method of using the `process_pointing_mode_*` callbacks will be covered under advance use.
