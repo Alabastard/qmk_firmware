@@ -59,11 +59,7 @@ static int16_t divisor_multiply16(int16_t value) {
 }
 
 static int8_t divisor_multiply8(int16_t value) {
-#    ifdef POINTING_DEVICE_MODES_FASTCALC
-    return clamp_int_16_to_8(value << pointing_mode_context.mode.divisor);
-#    else
     return clamp_int_16_to_8(value * (int16_t)pointing_mode_context.mode.divisor);
-#    endif
 }
 
 static int8_t divisor_divide8(int16_t value) {
@@ -243,7 +239,18 @@ static uint8_t get_pointing_mode_divisor(void) {
             break;
 
         case PM_DRAG:
+#    ifdef MOUSE_SCROLL_HIRES_ENABLE
+            if (MOUSE_SCROLL_MULTIPLIER_RAW) {
+                int8_t drag_multiplier = MAX(divisor_divide8(MOUSE_SCROLL_MULTIPLIER), 1);
+                pointing_mode_context.mode.x *= drag_multiplier;
+                pointing_mode_context.mode.y *= drag_multiplier;
+                divisor = 1;
+            } else {
+#    endif
             divisor = POINTING_DRAG_DIVISOR_H;
+#    ifdef MOUSE_SCROLL_HIRES_ENABLE
+            }
+#    endif
             break;
 
         case PM_CARET:
@@ -399,7 +406,7 @@ void pointing_tap_codes(uint16_t kc_left, uint16_t kc_down, uint16_t kc_up, uint
     if (kc_direction == KC_NO) return;
 
     // tap codes (assume that )
-    uint8_t taps = abs(count);
+    uint8_t taps = (uint8_t)abs(count);
     do {
         tap_code16_delay(kc_direction, POINTING_TAP_DELAY);
     } while (--taps);
@@ -467,24 +474,11 @@ static report_mouse_t process_pointing_mode(pointing_mode_t pointing_mode, repor
 
         // drag scroll mode (sets mouse axes to mouse_report h & v with divisor)
         case PM_DRAG:
-#    ifdef MOUSE_SCROLL_HIRES_ENABLE
-            if (MOUSE_SCROLL_MULTIPLIER_RAW_H) {
-                uint8_t drag_multiplier = MAX(divisor_divide8(MOUSE_SCROLL_MULTIPLIER_H), 1);
-                pointing_mode.x *= (int16_t)drag_multiplier;
-                pointing_mode_divisor_override(1);
-            }
-#    endif
             mouse_report.h = apply_divisor_hv(pointing_mode.x);
             pointing_mode.x -= multiply_divisor_hv(mouse_report.h);
-#    if ((POINTING_DRAG_DIVISOR_V != POINTING_DRAG_DIVISOR_H) || defined(MOUSE_SCROLL_HIRES_ENABLE))
+
+#    if (POINTING_DRAG_DIVISOR_V != POINTING_DRAG_DIVISOR_H)
             pointing_mode_divisor_override(POINTING_DRAG_DIVISOR_V);
-#    endif
-#    ifdef MOUSE_SCROLL_HIRES_ENABLE
-            if (MOUSE_SCROLL_MULTIPLIER_RAW_V) {
-                uint8_t drag_multiplier = divisor_divide8(MOUSE_SCROLL_MULTIPLIER_V);
-                pointing_mode.y *= (int16_t)drag_multiplier;
-                pointing_mode_divisor_override(1);
-            }
 #    endif
 
             mouse_report.v = apply_divisor_hv(pointing_mode.y);

@@ -244,8 +244,9 @@ typedef union {
         union {
             uint8_t data;
             struct {
-                uint8_t v : 4;
-                uint8_t h : 4;
+                uint8_t v        : 2;
+                uint8_t h        : 2;
+                uint8_t reserved : 4;
             } multiplier;
         };
     };
@@ -373,23 +374,24 @@ void clear_keys_from_report(report_keyboard_t* keyboard_report);
 
 #ifdef MOUSE_ENABLE
 bool has_mouse_report_changed(report_mouse_t* new_report, report_mouse_t* old_report);
-#endif
 
-#ifdef MOUSE_SCROLL_HIRES_ENABLE
+#    ifdef MOUSE_SCROLL_HIRES_ENABLE
+#        ifndef MOUSE_SCROLL_RESOLUTION
+#            define MOUSE_SCROLL_RESOLUTION 120
+#        endif
+#        if (MOUSE_SCROLL_RESOLUTION > 120 || MOUSE_SCROLL_RESOLUTION < 1)
+#            error  "MOUSE_SCROLL_RESOLUTION OUT OF RANGE set between 1-120"
+#        endif
+
 extern report_mouse_scroll_res_t mouse_scroll_res_report;
 
-bool set_hires_scroll_multiplier(uint8_t axis, uint8_t value);
 void resolution_multiplier_reset(void);
 
-#    define MOUSE_SCROLL_MULTIPLIER_RAW_FULL (mouse_scroll_res_report.data)
-#    define MOUSE_SCROLL_MULTIPLIER_RAW_V (mouse_scroll_res_report.multiplier.v)
-#    define MOUSE_SCROLL_MULTIPLIER_RAW_H (mouse_scroll_res_report.multiplier.h)
-//   The following assumes a Max multiplier of 120 and logical max of 15 for each multiplier in HID descriptor
-#    define MOUSE_SCROLL_MULTIPLIER_RESOLUTION 8
-#    define MULTIPLIER_CONVERSION(value) (uint8_t)(value >> 3)
-#    define MOUSE_SCROLL_MULTIPLIER_V (uint8_t)(MAX(mouse_scroll_res_report.multiplier.v * MOUSE_SCROLL_MULTIPLIER_RESOLUTION, 1))
-#    define MOUSE_SCROLL_MULTIPLIER_H (uint8_t)(MAX(mouse_scroll_res_report.multiplier.h * MOUSE_SCROLL_MULTIPLIER_RESOLUTION, 1))
-#endif
+#        define MOUSE_SCROLL_MULTIPLIER_RAW_FULL (mouse_scroll_res_report.data)
+#        define MOUSE_SCROLL_MULTIPLIER_RAW_V (mouse_scroll_res_report.multiplier.v)
+#        define MOUSE_SCROLL_MULTIPLIER_RAW_H (mouse_scroll_res_report.multiplier.h)
+#    endif  // MOUSE_HIRES_SCOLL_ENABLE
+#endif  // MOUSE_ENABLE
 
 #ifdef __cplusplus
 }
