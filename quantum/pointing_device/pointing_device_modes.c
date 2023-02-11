@@ -62,10 +62,6 @@ static int8_t divisor_multiply8(int16_t value) {
     return clamp_int_16_to_8(value * (int16_t)pointing_mode_context.mode.divisor);
 }
 
-static int8_t divisor_divide8(int16_t value) {
-    return clamp_int_16_to_8(value / (int16_t)pointing_mode_context.mode.divisor);
-}
-
 static int16_t divisor_divide16(int16_t value) {
     return value / (int16_t)pointing_mode_context.mode.divisor;
 }
@@ -240,8 +236,8 @@ static uint8_t get_pointing_mode_divisor(void) {
 
         case PM_DRAG:
 #    ifdef MOUSE_SCROLL_HIRES_ENABLE
-            if (MOUSE_SCROLL_MULTIPLIER_RAW) {
-                int8_t drag_multiplier = MAX(divisor_divide8(MOUSE_SCROLL_MULTIPLIER), 1);
+            if (MOUSE_SCROLL_MULTIPLIER_RAW_FULL) {
+                int8_t drag_multiplier = MAX(MOUSE_SCROLL_RESOLUTION / POINTING_DRAG_DIVISOR, 1);
                 pointing_mode_context.mode.x *= drag_multiplier;
                 pointing_mode_context.mode.y *= drag_multiplier;
                 divisor = 1;
@@ -476,11 +472,6 @@ static report_mouse_t process_pointing_mode(pointing_mode_t pointing_mode, repor
         case PM_DRAG:
             mouse_report.h = apply_divisor_hv(pointing_mode.x);
             pointing_mode.x -= multiply_divisor_hv(mouse_report.h);
-
-#    if (POINTING_DRAG_DIVISOR_V != POINTING_DRAG_DIVISOR_H)
-            pointing_mode_divisor_override(POINTING_DRAG_DIVISOR_V);
-#    endif
-
             mouse_report.v = apply_divisor_hv(pointing_mode.y);
             pointing_mode.y -= multiply_divisor_hv(mouse_report.v);
             set_pointing_mode(pointing_mode);
