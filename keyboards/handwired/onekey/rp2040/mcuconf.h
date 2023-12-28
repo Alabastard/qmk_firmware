@@ -10,3 +10,10 @@
 
 #undef RP_PWM_USE_PWM4
 #define RP_PWM_USE_PWM4 TRUE
+
+/* dont use I2C0, as it collides with uart0, e.g. 'CONSOLE_ENABLE = yes'/debug_enable=true;
+   #undef RP_I2C_USE_I2C0
+   #define RP_I2C_USE_I2C0 TRUE
+*/
+#undef RP_I2C_USE_I2C1
+#define RP_I2C_USE_I2C1 TRUE
