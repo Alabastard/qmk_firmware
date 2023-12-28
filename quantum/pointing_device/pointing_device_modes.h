@@ -90,10 +90,10 @@
 
 /* enums */
 enum pointing_device_directions {
-    PD_DOWN  = 0, // default value
-    PD_UP    = 1,
-    PD_LEFT  = 2,
-    PD_RIGHT = 3
+    PD_DOWN  = 1, // default value
+    PD_UP    = 2,
+    PD_LEFT  = 4,
+    PD_RIGHT = 8
 };
 
 enum pointing_devide_mode_devices {
