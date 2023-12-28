@@ -326,6 +326,7 @@ mouse_report_update:
     mouse_report.x = report_x;
     mouse_report.y = report_y;
 
+    pd_dprintf("%s [%3d, %3d] \n", __FUNCTION__, mouse_report.x, mouse_report.y);
     return mouse_report;
 }
 

@@ -259,7 +259,15 @@ __attribute__((weak)) report_mouse_t pointing_modes_axes_conv(pointing_mode_t po
 #    else
     pointing_mode.y += mouse_report.y;
 #    endif
-    set_pointing_mode(pointing_mode);
+
+    if ((pointing_mode.mode_id == PM_DPAD) &&
+        (mouse_report.x == 0) &&
+        (mouse_report.y == 0)) {
+        pointing_mode_reset();
+    } else {
+        set_pointing_mode(pointing_mode);
+    }
+
     mouse_report.x = 0;
     mouse_report.y = 0;
     return mouse_report;
@@ -345,11 +353,13 @@ static uint8_t get_pointing_mode_divisor(void) {
  *
  * Determines direction based on axis with largest magnitude
  *
- * NOTE: Defaults to PD_DOWN
- *
  * @return direction uint8_t
  */
 static uint8_t get_pointing_mode_direction(void) {
+    if ((pointing_modes[current_device].x == 0) &&
+        (pointing_modes[current_device].y == 0))
+        return 0;
+
     if (abs(pointing_modes[current_device].x) > abs(pointing_modes[current_device].y)) {
         if (pointing_modes[current_device].x > 0) {
             return PD_RIGHT;
@@ -447,6 +457,12 @@ static void pointing_tap_keycodes_raw(uint16_t* pm_keycodes) {
 void pointing_tap_codes(uint16_t kc_left, uint16_t kc_down, uint16_t kc_up, uint16_t kc_right) {
     uint16_t pm_keycodes[4] = {kc_down, kc_up, kc_left, kc_right};
     pointing_tap_keycodes_raw(pm_keycodes);
+}
+
+void pointing_hold_codes(uint16_t kc_left, uint16_t kc_down, uint16_t kc_up, uint16_t kc_right) {
+    pd_dprintf("%s modes: [x%3d, y%3d] \n", __FUNCTION__,
+               pointing_modes[current_device].x,
+               pointing_modes[current_device].y);
 }
 
 /**
@@ -557,6 +573,11 @@ static report_mouse_t process_pointing_mode(pointing_mode_t pointing_mode, repor
         // caret mode (uses arrow keys to move cursor)
         case PM_CARET:
             pointing_tap_codes(KC_LEFT, KC_DOWN, KC_UP, KC_RIGHT);
+            break;
+
+        // dpad mode (hold cursor keys in relation to current direction)
+        case PM_DPAD:
+            pointing_hold_codes(KC_LEFT, KC_DOWN, KC_UP, KC_RIGHT);
             break;
 
         // history scroll mode (will scroll through undo/redo history)

@@ -137,6 +137,9 @@ uint8_t           current_pointing_mode_direction(void);            // return cu
 /* ----------For Custom modes without maps---------------------------------------------------------------------- */
 void pointing_tap_codes(uint16_t kc_left, uint16_t kc_down, uint16_t kc_up, uint16_t kc_right); // pointing_mode x/y to keycode taps
 
+// pointing_mode x/y direction to held keycodes, released when x/y movement drops below threshold
+void pointing_hold_codes(uint16_t kc_left, uint16_t kc_down, uint16_t kc_up, uint16_t kc_right);
+
 /* ----------Callbacks for modifying and adding pointing modes---------------------------------------------------- */
 bool process_pointing_mode_kb(pointing_mode_t pointing_mode, report_mouse_t* mouse_report);   // keyboard level
 bool process_pointing_mode_user(pointing_mode_t pointing_mode, report_mouse_t* mouse_report); // user/keymap level
