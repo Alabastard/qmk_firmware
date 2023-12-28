@@ -36,8 +36,8 @@ static uint8_t       selected_device = POINTING_MODES_DEFAULT_DEVICE;
 
 static uint8_t         current_direction = 0;
 static uint8_t         current_divisor   = POINTING_DEFAULT_DIVISOR;
-static uint8_t         toggle_ids[]      = {[0 ... POINTING_MODES_DEVICE_CONTROL_COUNT - 1] = POINTING_MODE_DEFAULT};
-static pointing_mode_t pointing_modes[]  = {[0 ... POINTING_MODES_DEVICE_CONTROL_COUNT - 1] = {.id = POINTING_MODE_DEFAULT}};
+static uint8_t         toggle_mode_ids[]      = {[0 ... POINTING_MODES_DEVICE_CONTROL_COUNT - 1] = POINTING_MODE_DEFAULT};
+static pointing_mode_t pointing_modes[]  = {[0 ... POINTING_MODES_DEVICE_CONTROL_COUNT - 1] = {.mode_id = POINTING_MODE_DEFAULT}};
 
 // set up clamping and divisor application functions
 static inline int8_t clamp_int_16_to_8(int16_t value) {
@@ -177,7 +177,7 @@ void set_pointing_mode_device(uint8_t device) {
  */
 void pointing_mode_reset(void) {
     memset(&pointing_modes[current_device], 0, sizeof(pointing_mode_t));
-    pointing_modes[current_device].id = toggle_ids[current_device];
+    pointing_modes[current_device].mode_id = toggle_mode_ids[current_device];
 }
 
 /**
@@ -197,7 +197,7 @@ void set_pointing_mode(pointing_mode_t pointing_mode) {
  * @return uint8_t current pointing mode id
  */
 uint8_t get_pointing_mode_id(void) {
-    return pointing_modes[current_device].id;
+    return pointing_modes[current_device].mode_id;
 }
 
 /**
@@ -208,7 +208,7 @@ uint8_t get_pointing_mode_id(void) {
 void set_pointing_mode_id(uint8_t mode_id) {
     if (get_pointing_mode_id() != mode_id) {
         pointing_mode_reset();
-        pointing_modes[current_device].id = mode_id;
+        pointing_modes[current_device].mode_id = mode_id;
     }
 }
 
@@ -218,7 +218,7 @@ void set_pointing_mode_id(uint8_t mode_id) {
  * @return uint8_t toggle pointing mode
  */
 uint8_t get_toggled_pointing_mode_id(void) {
-    return toggle_ids[current_device];
+    return toggle_mode_ids[current_device];
 }
 
 /**
@@ -230,9 +230,9 @@ uint8_t get_toggled_pointing_mode_id(void) {
  */
 void toggle_pointing_mode_id(uint8_t mode_id) {
     if (get_toggled_pointing_mode_id() == mode_id) {
-        toggle_ids[current_device] = POINTING_MODE_DEFAULT;
+        toggle_mode_ids[current_device] = POINTING_MODE_DEFAULT;
     } else {
-        toggle_ids[current_device] = mode_id;
+        toggle_mode_ids[current_device] = mode_id;
     }
     if (get_pointing_mode_id() != get_toggled_pointing_mode_id()) pointing_mode_reset();
 }
@@ -525,7 +525,7 @@ static report_mouse_t process_pointing_mode(pointing_mode_t pointing_mode, repor
     if (!(process_pointing_mode_user(pointing_mode, &mouse_report) && process_pointing_mode_kb(pointing_mode, &mouse_report))) {
         return mouse_report;
     }
-    switch (pointing_mode.id) {
+    switch (pointing_mode.mode_id) {
         // precision mode  (reduce x y sensitivity temporarily)
         case PM_PRECISION:
 #    ifdef POINTING_DEVICE_MODES_INVERT_X
@@ -573,8 +573,8 @@ static report_mouse_t process_pointing_mode(pointing_mode_t pointing_mode, repor
 
 #    ifdef POINTING_MODE_MAP_ENABLE
         default:
-            if (pointing_mode.id > POINTING_MODE_MAP_START) {
-                pointing_exec_mapping(pointing_mode.id - POINTING_MODE_MAP_START);
+            if (pointing_mode.mode_id > POINTING_MODE_MAP_START) {
+                pointing_exec_mapping(pointing_mode.mode_id - POINTING_MODE_MAP_START);
             }
 #    endif
     }

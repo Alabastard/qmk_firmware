@@ -108,15 +108,15 @@ enum pointing_devide_mode_devices {
 
 /* local data structures */
 typedef struct {
-    uint8_t id;
+    uint8_t mode_id;
     int16_t x;
     int16_t y;
 } pointing_mode_t;
 
 /* ----------Controlling pointing device modes-------------------------------------------------------------------- */
-void    set_pointing_mode_id(uint8_t mode_id);    // set current pointing_mode.id to mode_id
+void    set_pointing_mode_id(uint8_t mode_id);    // set current pointing_mode.mode_id to mode_id
 void    toggle_pointing_mode_id(uint8_t mode_id); // toggle pointing mode
-uint8_t get_pointing_mode_id(void);               // return current pointing_mode.id
+uint8_t get_pointing_mode_id(void);               // return current pointing_mode.mode_id
 uint8_t get_toggled_pointing_mode_id(void);       // return current tg_mode_id
 void    pointing_mode_reset(void);                // reset pointing mode to current toggle mode
 
