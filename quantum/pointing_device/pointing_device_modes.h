@@ -89,14 +89,14 @@
 #endif
 
 /* enums */
-enum pointing_device_directions {
+enum pointing_mode_directions {
     PD_DOWN  = 1, // default value
     PD_UP    = 2,
     PD_LEFT  = 4,
     PD_RIGHT = 8
 };
 
-enum pointing_devide_mode_devices {
+enum pointing_mode_devices {
 #ifdef MASTER_RIGHT
     PM_RIGHT_DEVICE = 0,
     PM_LEFT_DEVICE
@@ -114,39 +114,39 @@ typedef struct {
 } pointing_mode_t;
 
 /* ----------Controlling pointing device modes-------------------------------------------------------------------- */
-void    set_pointing_mode_id(uint8_t mode_id);    // set current pointing_mode.mode_id to mode_id
-void    toggle_pointing_mode_id(uint8_t mode_id); // toggle pointing mode
-uint8_t get_pointing_mode_id(void);               // return current pointing_mode.mode_id
-uint8_t get_toggled_pointing_mode_id(void);       // return current tg_mode_id
-void    pointing_mode_reset(void);                // reset pointing mode to current toggle mode
+void    pointing_mode_set_mode(uint8_t mode_id);    // set current pointing_mode.mode_id to mode_id
+void    pointing_mode_toggle_mode(uint8_t mode_id); // toggle pointing mode
+uint8_t pointing_mode_get_mode(void);               // return current pointing_mode.mode_id
+uint8_t pointing_mode_get_toggled_mode(void);       // return current tg_mode_id
+void    pointing_mode_reset_mode(void);                // reset pointing mode to current toggle mode
 
 /* ----------Controlling pointing device data conversion---------------------------------------------------------- */
-report_mouse_t pointing_modes_axes_conv(pointing_mode_t pointing_mode, report_mouse_t mouse_report); // converts x & y axes to local h & v
+report_mouse_t pointing_mode_axis_conv(pointing_mode_t pointing_mode, report_mouse_t mouse_report); // converts x & y axes to local h & v
 
 /* ----------Crontrolling pointing mode data---------------------------------------------------------------------- */
-void              set_pointing_mode(pointing_mode_t pointing_mode); // overwrite local pointing_mode status
+void              pointing_mode_overwrite_current_mode(pointing_mode_t pointing_mode); // overwrite local pointing_mode status
 void              pointing_mode_update(void);                       // update direction & divisor from current mode id, x, y
-mouse_xy_report_t apply_divisor_xy(int16_t value);                  // divide value by current divisor and clamp to x/y range
-int8_t            apply_divisor_hv(int16_t value);                  // divide value by current divisor and clamps to h/v range
-int16_t           multiply_divisor_xy(mouse_xy_report_t value);     // multiply mouse x/y value by current divisor
-int16_t           multiply_divisor_hv(int8_t value);                // multiply mousen h/v value by current divisor
+mouse_xy_report_t pointing_mode_apply_divisor_xy(int16_t value);                  // divide value by current divisor and clamp to x/y range
+int8_t            pointing_mode_apply_divisor_hv(int16_t value);                  // divide value by current divisor and clamps to h/v range
+int16_t           pointing_mode_multipliy_divisor_xy(mouse_xy_report_t value);     // multiply mouse x/y value by current divisor
+int16_t           pointing_mode_multipliy_divisor_hv(int8_t value);                // multiply mousen h/v value by current divisor
 void              pointing_mode_divisor_override(uint8_t divisor);  // override current divisor
-uint8_t           current_pointing_mode_divisor(void);              // return current divisor
-uint8_t           current_pointing_mode_direction(void);            // return current direction
+uint8_t           pointing_mode_get_current_divisor(void);              // return current divisor
+uint8_t           pointing_mode_get_current_direction(void);            // return current direction
 
 /* ----------For Custom modes without maps---------------------------------------------------------------------- */
-void pointing_tap_codes(uint16_t kc_left, uint16_t kc_down, uint16_t kc_up, uint16_t kc_right); // pointing_mode x/y to keycode taps
+void pointing_mode_tap_codes(uint16_t kc_left, uint16_t kc_down, uint16_t kc_up, uint16_t kc_right); // pointing_mode x/y to keycode taps
 
 // pointing_mode x/y direction to held keycodes, released when x/y movement drops below threshold
-void pointing_hold_codes(uint16_t kc_left, uint16_t kc_down, uint16_t kc_up, uint16_t kc_right);
+void pointing_mode_hold_codes(uint16_t kc_left, uint16_t kc_down, uint16_t kc_up, uint16_t kc_right);
 
 /* ----------Callbacks for modifying and adding pointing modes---------------------------------------------------- */
-bool process_pointing_mode_kb(pointing_mode_t pointing_mode, report_mouse_t* mouse_report);   // keyboard level
-bool process_pointing_mode_user(pointing_mode_t pointing_mode, report_mouse_t* mouse_report); // user/keymap level
+bool pointing_mode_process_kb(pointing_mode_t pointing_mode, report_mouse_t* mouse_report);   // keyboard level
+bool pointing_mode_process_user(pointing_mode_t pointing_mode, report_mouse_t* mouse_report); // user/keymap level
 
 /* ----------Callbacks for adding/modifying pointing device mode divisors----------------------------------------- */
-uint8_t get_pointing_mode_divisor_kb(uint8_t mode_id, uint8_t direction);   // adding new divisors at keyboard level
-uint8_t get_pointing_mode_divisor_user(uint8_t mode_id, uint8_t direction); // adding new divisors at user/keymap level
+uint8_t pointing_mode_get_divisor_kb(uint8_t mode_id, uint8_t direction);   // adding new divisors at keyboard level
+uint8_t pointing_mode_get_divisor_user(uint8_t mode_id, uint8_t direction); // adding new divisors at user/keymap level
 bool    pointing_mode_divisor_postprocess_kb(uint8_t* divisor);             // keyboard level modifying of divisors after get_pointing_mode_divisor_* stack
 bool    pointing_mode_divisor_postprocess_user(uint8_t* divisor);           // user/keymap level modifying of divisors after get_pointing_mode_divisor_* stack
 
@@ -165,5 +165,5 @@ extern const uint16_t PROGMEM pointing_mode_maps[][POINTING_NUM_DIRECTIONS];
 
 #endif // POINTING_MODE_MAP_ENABLE
 /* ----------For multiple pointing devices------------------------------------------------------------------------ */
-uint8_t get_pointing_mode_device(void);           // get current active device for pointing modes
-void    set_pointing_mode_device(uint8_t device); // set current active pointing mode side (PM_LEFT_SIDE, PM_RIGHT_SIDE, etc.)
+uint8_t pointing_mode_get_current_device(void);           // get current active device for pointing modes
+void    pointing_mode_set_current_device(uint8_t device); // set current active pointing mode side (PM_LEFT_SIDE, PM_RIGHT_SIDE, etc.)

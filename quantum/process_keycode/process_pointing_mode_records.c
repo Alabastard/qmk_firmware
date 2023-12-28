@@ -30,10 +30,10 @@
  */
 void pointing_mode_key_momentary(uint8_t mode_id, bool pressed) {
     if (pressed) {
-        set_pointing_mode_id(mode_id);
-    } else if (get_pointing_mode_id() == mode_id) {
+        pointing_mode_set_mode(mode_id);
+    } else if (pointing_mode_get_mode() == mode_id) {
         // reset mode only if the current mode matches (in case mode has changed before release)
-        pointing_mode_reset();
+        pointing_mode_reset_mode();
     }
 }
 
@@ -47,7 +47,7 @@ void pointing_mode_key_momentary(uint8_t mode_id, bool pressed) {
  */
 void pointing_mode_key_toggle(uint8_t mode_id, bool pressed) {
     // only attempt to change mode on key release event (matches layer toggle behaviour)
-    if (!pressed) toggle_pointing_mode_id(mode_id);
+    if (!pressed) pointing_mode_toggle_mode(mode_id);
 }
 
 /**
@@ -59,7 +59,7 @@ void pointing_mode_key_toggle(uint8_t mode_id, bool pressed) {
  * @params pressed[in] bool
  */
 void pointing_mode_key_set_device(uint8_t device, bool pressed) {
-    if (!pressed) set_pointing_mode_device(device);
+    if (!pressed) pointing_mode_set_current_device(device);
 }
 
 /**
@@ -87,7 +87,7 @@ bool process_pointing_mode_records(uint16_t keycode, keyrecord_t* record) {
 #    if (POINTING_MODE_NUM_DEVICES > 1)
         // utils: Cycle devices
         case QK_PM_CYCLE_DEVICES:
-            pointing_mode_key_set_device(get_pointing_mode_device() + 1, record->event.pressed);
+            pointing_mode_key_set_device(pointing_mode_get_current_device() + 1, record->event.pressed);
             return true;
         // utils: DEVICE RIGHT
         case QK_PM_DEVICE_RIGHT:
