@@ -84,7 +84,7 @@ bool process_pointing_mode_records(uint16_t keycode, keyrecord_t* record) {
             pointing_mode_key_toggle((keycode - QK_POINTING_MODE_TG) & (QK_POINTING_MODE_TG_MAX - QK_POINTING_MODE_TG), record->event.pressed);
             return true; // allow further processing
 
-#    if (POINTING_MODES_NUM_DEVICES > 1)
+#    if (POINTING_MODE_NUM_DEVICES > 1)
         // utils: Cycle devices
         case QK_PM_CYCLE_DEVICES:
             pointing_mode_key_set_device(get_pointing_mode_device() + 1, record->event.pressed);

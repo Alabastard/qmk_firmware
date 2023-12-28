@@ -470,7 +470,7 @@ report_mouse_t pointing_device_adjust_by_defines_right(report_mouse_t mouse_repo
  *
  * Takes 2 report_mouse_t structs allowing individual modification of either side and then returns pointing_device_task_combined_kb.
  *
- * NOTE: Only available when using both SPLIT_POINTING_ENABLE and POINTING_DEVICE_COMBINED
+ * NOTE: Only available when using both SPLIT_POINTING_ENABLE and POINTING_MODE_DEVICE_COMBINED
  *
  * @param[in] left_report report_mouse_t
  * @param[in] right_report report_mouse_t
@@ -478,7 +478,7 @@ report_mouse_t pointing_device_adjust_by_defines_right(report_mouse_t mouse_repo
  */
 report_mouse_t pointing_device_task_combined(report_mouse_t left_report, report_mouse_t right_report) {
 #    ifdef POINTING_DEVICE_MODES_ENABLE
-#        if POINTING_MODES_SINGLE_CONTROL
+#        if POINTING_MODE_SINGLE_CONTROL
     // only one side controlled at any one time
     switch (get_pointing_mode_device()) {
         case PM_RIGHT_DEVICE:

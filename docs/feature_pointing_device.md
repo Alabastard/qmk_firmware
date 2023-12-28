@@ -964,7 +964,7 @@ Pointing device modes activated by toggle type functions/macros have their mode 
 -***These modes can all be overwritten with the exception of `PM_NONE`.***
 -***Mode ids 6-15 are free to be used for custom modes without overwriting a mode and will be supported by the built in keycode macros `PM_MO(<pm>)` and `PM_TG(<pm>)` (see adding custom modes below)***
 _***`PM_PRECISION` is intended to slow cursor movement when desired on devices without CPI settings or when changing CPI settings is unreliable or undesirable***
--***`PM_PRECISION` has additional behaviour when it is toggled, all modes activated as momentary modes will have their divisors multiplied by `POINTING_PRECISION_DIVISOR` while `PM_PRECISION` is the current toggle mode (see adding divisors for more detail)***
+-***`PM_PRECISION` has additional behaviour when it is toggled, all modes activated as momentary modes will have their divisors multiplied by `POINTING_MODE_PRECISION_DIVISOR` while `PM_PRECISION` is the current toggle mode (see adding divisors for more detail)***
 
 #### Use In A keymap:
 
@@ -987,29 +987,29 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 | `POINTING_DEVICE_MODES_INVERT_X` | (optional) Inverts stored y axis accumulation (affects all modes)                         |  `NA`   |    `None`    |            _Not defined_ |
 | `POINTING_DEVICE_MODES_INVERT_Y` | (optional) Inverts stored x axis accumulation (affects all modes)                         |  `NA`   |    `None`    |            _Not defined_ |
 | `POINTING_MODE_DEFAULT`          | (optional) Default pointing device mode                                                   | `0-255` |    `None`    |                `PM_NONE` |
-| `POINTING_TAP_DELAY`             | (optional) Delay between key presses in `pointing_tap_codes` in ms                        | `0-255` |     `ms`     |         `TAP_CODE_DELAY` |
+| `POINTING_MODE_TAP_DELAY`             | (optional) Delay between key presses in `pointing_tap_codes` in ms                        | `0-255` |     `ms`     |         `TAP_CODE_DELAY` |
 | `POINTING_MODE_MAP_ENABLE`       | (optional) Enable use of pointing mode maps                                               |  `NA`   |    `None`    |            _Not defined_ |
 | `POINTING_MODE_MAP_START`        | (optional) Starting mode id of `pointing_device_mode_maps`                                | `0-255` |    `None`    |          `PM_SAFE_RANGE` |
-| `POINTING_DEFAULT_DIVISOR`       | (optional) Default divisor for all modes that do not have a defined divisor               | `1-255` |   `Varies`   |                     `64` |
-| `POINTING_HISTORY_DIVISOR`       | (optional) Accumulated stored x/y per key tap in `PM_HISTORY` mode                        | `1-255` | `(x\|y)/tap` |                     `64` |
-| `POINTING_VOLUME_DIVISOR`        | (optional) Accumulated stored x/y per key tap in `PM_VOLUME` mode                         | `1-255` | `(x\|y)/tap` |                     `64` |
-| `POINTING_CARET_DIVISOR`         | (optional) Accumulated stored x/y per key tap in `PM_CARET` mode                          | `1-255` | `(x\|y)/tap` |                     `32` |
-| `POINTING_CARET_DIVISOR_V`       | (optional) x input per left/right tap in `PM_CARET`(_overrides_ `POINTING_CARET_DIVISOR`) | `1-255` |   `(y)/tap`  | `POINTING_CARET_DIVISOR` |
-| `POINTING_CARET_DIVISOR_H`       | (optional) y input per up/down tap in `PM_CARET`(_overrides_ `POINTING_CARET_DIVISOR`)    | `1-255` |   `(x)/tap`  | `POINTING_CARET_DIVISOR` |
-| `POINTING_PRECISION_DIVISOR`     | (optional) Pointing device x/y movement per output x/y in `PM_PRECISION` mode             | `1-255` | `(x\|y)/dot` |                      `2` |
-| `POINTING_DRAG_DIVISOR`          | (optional) Pointing device x/y movement per h/v axis tick in `PM_DRAG` mode               | `1-255` | `(x\|y)/dot` |                      `4` |
+| `POINTING_MODE_DEFAULT_DIVISOR`       | (optional) Default divisor for all modes that do not have a defined divisor               | `1-255` |   `Varies`   |                     `64` |
+| `POINTING_MODE_HISTORY_DIVISOR`       | (optional) Accumulated stored x/y per key tap in `PM_HISTORY` mode                        | `1-255` | `(x\|y)/tap` |                     `64` |
+| `POINTING_MODE_VOLUME_DIVISOR`        | (optional) Accumulated stored x/y per key tap in `PM_VOLUME` mode                         | `1-255` | `(x\|y)/tap` |                     `64` |
+| `POINTING_MODE_CARET_DIVISOR`         | (optional) Accumulated stored x/y per key tap in `PM_CARET` mode                          | `1-255` | `(x\|y)/tap` |                     `32` |
+| `POINTING_MODE_CARET_DIVISOR_V`       | (optional) x input per left/right tap in `PM_CARET`(_overrides_ `POINTING_MODE_CARET_DIVISOR`) | `1-255` |   `(y)/tap`  | `POINTING_MODE_CARET_DIVISOR` |
+| `POINTING_MODE_CARET_DIVISOR_H`       | (optional) y input per up/down tap in `PM_CARET`(_overrides_ `POINTING_MODE_CARET_DIVISOR`)    | `1-255` |   `(x)/tap`  | `POINTING_MODE_CARET_DIVISOR` |
+| `POINTING_MODE_PRECISION_DIVISOR`     | (optional) Pointing device x/y movement per output x/y in `PM_PRECISION` mode             | `1-255` | `(x\|y)/dot` |                      `2` |
+| `POINTING_MODE_DRAG_DIVISOR`          | (optional) Pointing device x/y movement per h/v axis tick in `PM_DRAG` mode               | `1-255` | `(x\|y)/dot` |                      `4` |
 
 !> For processors without hardware supported integer division it is generally recommended that powers of 2 are used for divisors (_i.e. 1, 2, 4, 8, 16, 32, 64, 128_) as it will usually optimize better (both faster and less code space), however **any positive integer of 255 or less** can work.
 
 Speed and sensitivity of any mode will be impacted by the pointing device CPI setting so divisors may need to be adjusted to personal preference and CPI settings typically used (_note dynamic divisors adjustment based on cpi could be used for testing_).
 
-!> Drag scroll speed will additionally be effected by OS mouse scroll settings, there are usually separate settings for scroll "wheel" and "wheel tilt" which is Vertical and Horizontal scroll respectively. The `POINTING_DRAG_DIVISOR` default value of 16 is based on having mouse settings in the OS set to three lines per tick of "mouse wheel" or "wheel tilt" (_Windows Default_).
+!> Drag scroll speed will additionally be effected by OS mouse scroll settings, there are usually separate settings for scroll "wheel" and "wheel tilt" which is Vertical and Horizontal scroll respectively. The `POINTING_MODE_DRAG_DIVISOR` default value of 16 is based on having mouse settings in the OS set to three lines per tick of "mouse wheel" or "wheel tilt" (_Windows Default_).
 
-`POINTING_PRECISION_DIVISOR` default will half cursor speed when active (_divisor of 2_) but a divisor of 4 is fine to use as well but the cursor will be twice as slow as the default, however divisors of 8 or greater will likely only work well for very high cpi settings.
+`POINTING_MODE_PRECISION_DIVISOR` default will half cursor speed when active (_divisor of 2_) but a divisor of 4 is fine to use as well but the cursor will be twice as slow as the default, however divisors of 8 or greater will likely only work well for very high cpi settings.
 
-Recommended settings for `POINTING_CARET_DIVISOR_V` and `POINTING_CARET_DIVISOR_H` are `16` and `32` respectively which will give preference to horizontal caret movement (`KC_LEFT`, `KC_RIGHT`) over vertical (`KC_UP`, `KC_DOWN`) giving even more stability to horizontal movement (_reducing errant up and down movement_).
+Recommended settings for `POINTING_MODE_CARET_DIVISOR_V` and `POINTING_MODE_CARET_DIVISOR_H` are `16` and `32` respectively which will give preference to horizontal caret movement (`KC_LEFT`, `KC_RIGHT`) over vertical (`KC_UP`, `KC_DOWN`) giving even more stability to horizontal movement (_reducing errant up and down movement_).
 
-!> `POINTING_TAP_DELAY` defaults to `TAP_CODE_DELAY` so if `TAP_CODE_DELAY` is set high it can cause some noticeable latency on some modes such as `PM_CARET`
+!> `POINTING_MODE_TAP_DELAY` defaults to `TAP_CODE_DELAY` so if `TAP_CODE_DELAY` is set high it can cause some noticeable latency on some modes such as `PM_CARET`
 
 ### Basic Custom Modes
 
@@ -1021,7 +1021,7 @@ The easiest way to add pointing device modes that are only using keycode taps (s
 
 ```c
 // Pointing Device Mode Maps Format
-const uint16_t PROGMEM pointing_device_mode_maps[][POINTING_NUM_DIRECTIONS] = {
+const uint16_t PROGMEM pointing_device_mode_maps[][POINTING_MODE_NUM_DIRECTIONS] = {
     [0] = POINTING_MODE_LAYOUT(
                 <keycode up>,
         <keycode left>,       <keycode right>,
@@ -1067,7 +1067,7 @@ enum keymap_pointing_mode_maps_index {
     _PM_RGB_MSP   // fifth mode map  [index  5]
 };
 
-const uint16_t PROGMEM pointing_device_mode_maps[][POINTING_NUM_DIRECTIONS] = {
+const uint16_t PROGMEM pointing_device_mode_maps[][POINTING_MODE_NUM_DIRECTIONS] = {
     [_PM_BROW] = POINTING_MODE_LAYOUT(
                 C(S(KC_PGUP)),
         C(S(KC_TAB)),       C(KC_TAB),
@@ -1102,8 +1102,8 @@ The mode map array starts at index 0 and **must** be in the **same order** as th
 
 ### Adding & Customizing Divisors
 
-All Newly added modes will use `POINTING_DEFAULT_DIVISOR` unless a divisor is defined for the modes in the `get_pointing_mode_divisor` callback functions.
-For most keycode tapping modes a divisor of `64` works well, which is the default divisor for `POINTING_DEFAULT_DIVISOR`.  The `get_pointing_mode_divisor_*` callbacks have two variables available, `mode_id` which is the current pointing device mode id and `direction` which indicates the primary direction of the stored accumulated h/v values with the largest magnitude (_see table below_).  This makes it simple to have a unique divisor for each direction or axis for a particular mode.
+All Newly added modes will use `POINTING_MODE_DEFAULT_DIVISOR` unless a divisor is defined for the modes in the `get_pointing_mode_divisor` callback functions.
+For most keycode tapping modes a divisor of `64` works well, which is the default divisor for `POINTING_MODE_DEFAULT_DIVISOR`.  The `get_pointing_mode_divisor_*` callbacks have two variables available, `mode_id` which is the current pointing device mode id and `direction` which indicates the primary direction of the stored accumulated h/v values with the largest magnitude (_see table below_).  This makes it simple to have a unique divisor for each direction or axis for a particular mode.
 
 | Direction code | Value |Description                                                                                         |
 | :------------- | ----- | -------------------------------------------------------------------------------------------------- |
@@ -1155,13 +1155,13 @@ uint8_t get_pointing_mode_divisor_user(uint8_t mode_id, uint8_t direction) {
             }
 
         case PM_SLOW:
-            return 64; // could skip adding this if default if POINTING_DEFAULT_DIVISOR is 64
+            return 64; // could skip adding this if default if POINTING_MODE_DEFAULT_DIVISOR is 64
     }
 
     return 0; // returning 0 to let processing of divisors continue
 }
 ```
-This code assigns some divisors for some of the modes added in a previous code example showing some of the things that are possible with defining divisors. It could also be possible to make divisors adjust based on global variables such as a dynamic divisor adjustment term (_note that if a divisor of zero is returned it will default to_ `POINTING_DIVISOR_DEFAULT`).
+This code assigns some divisors for some of the modes added in a previous code example showing some of the things that are possible with defining divisors. It could also be possible to make divisors adjust based on global variables such as a dynamic divisor adjustment term (_note that if a divisor of zero is returned it will default to_ `POINTING_MODE_DIVISOR_DEFAULT`).
 
 ### Using `pointing_mode_divisor_postprocess` stack
 
@@ -1421,7 +1421,7 @@ bool process_pointing_mode_kb(pointing_mode_t pointing_mode, report_mouse_t* mou
             {
                 // add linear boost to cursor x speed
                 mouse_xy_report_t temp_mouse_axis = apply_divisor_xy(pointing_mode.x);
-#ifdef POINTING_DEVICE_INVERT_H
+#ifdef POINTING_MODE_DEVICE_INVERT_H
                 mouse_report->x = CONSTRAIN_XY(mouse_report->x - temp_mouse_axis);
 #else
                 mouse_report->x = CONSTRAIN_XY(mouse_report->x + temp_mouse_axis);
@@ -1430,7 +1430,7 @@ bool process_pointing_mode_kb(pointing_mode_t pointing_mode, report_mouse_t* mou
                 pointing_mode.x -= multiply_divisor_xy(temp_mouse_axis);
                 // add linear boost to cursor y speed
                 temp_mouse_axis = apply_divisor_xy(pointing_mode.y);
-#ifdef POINTING_DEVICE_INVERT_V
+#ifdef POINTING_MODE_DEVICE_INVERT_V
                 mouse_report->y = CONSTRAIN_XY(mouse_report->y - apply_divisor_xy(pointing_mode.y));
 #else
                 mouse_report->y = CONSTRAIN_XY(mouse_report->y + apply_divisor_xy(pointing_mode.y));
@@ -1478,21 +1478,21 @@ bool process_record_kb(uint16_t keycode, keyrecord_t* record) {
 
 ```
 
-!> Note that in the above code example there needed to be some additional handling of `POINTING_DEVICE_INVERT_V` and `POINTING_DEVICE_INVERT_H` when modifying cursor movement specifically as these may not work as expected if either of these options is defined.
+!> Note that in the above code example there needed to be some additional handling of `POINTING_MODE_DEVICE_INVERT_V` and `POINTING_MODE_DEVICE_INVERT_H` when modifying cursor movement specifically as these may not work as expected if either of these options is defined.
 
 ## Multiple Pointing Devices
 
-Pointing modes supports multiple pointing devices allowing for either control of one pointing device at a time or simultaneous control of multiple pointing devices. This supports left and right devices natively when both `SPLIT_POINTING_ENABLE` and `POINTING_DEVICE_COMBINED` as either single or simultaneous control (depending if `POINTING_MODES_SINGLE_CONTROL` is defined), However while controlling 3 or more pointing devices is possible this will need to be handled by using a custom `pointing_device_task` function.
+Pointing modes supports multiple pointing devices allowing for either control of one pointing device at a time or simultaneous control of multiple pointing devices. This supports left and right devices natively when both `SPLIT_POINTING_ENABLE` and `POINTING_DEVICE_COMBINED` as either single or simultaneous control (depending if `POINTING_MODE_SINGLE_CONTROL` is defined), However while controlling 3 or more pointing devices is possible this will need to be handled by using a custom `pointing_device_task` function.
 
 #### Relevant Settings
 
 | Define                                | Description all (optional)                                                                                     | Data type |  Range  |       Default |
 | ------------------------------------- | -------------------------------------------------------------------------------------------------------------- | :-------: | :-----: | ------------: |
-| `POINTING_MODES_NUM_DEVICES`          | (optional) Number of devices available for control (intended for when using more than 2 pointing devices)      | `uint8_t` | `1-255` |    `1` or `2` |
-| `POINTING_MODES_SINGLE_CONTROL`       | (optional) Force control of only one device at a time (but the active device can be switched)                  |   _None_  |  _None_ | _Not defined_ |
-| `POINTING_MODES_DEFAULT_DEVICE_ID`    | (optional) Default device id controlled (`PM_RIGHT_DEVICE`, `PM_LEFT_DEVICE` depending on `MASTER_RIGHT`)      | `uint8_t` | `1-255` |           `0` |
+| `POINTING_MODE_NUM_DEVICES`          | (optional) Number of devices available for control (intended for when using more than 2 pointing devices)      | `uint8_t` | `1-255` |    `1` or `2` |
+| `POINTING_MODE_SINGLE_CONTROL`       | (optional) Force control of only one device at a time (but the active device can be switched)                  |   _None_  |  _None_ | _Not defined_ |
+| `POINTING_MODE_DEFAULT_DEVICE_ID`    | (optional) Default device id controlled (`PM_RIGHT_DEVICE`, `PM_LEFT_DEVICE` depending on `MASTER_RIGHT`)      | `uint8_t` | `1-255` |           `0` |
 
-!> `POINTING_MODES_NUM_DEVICES` defaults to 2 if both `SPLIT_POINTING_ENABLE` and `POINTING_DEVICE_COMBINED` are defined
+!> `POINTING_MODE_NUM_DEVICES` defaults to 2 if both `SPLIT_POINTING_ENABLE` and `POINTING_DEVICE_COMBINED` are defined
 
 #### Default device id defines
 
@@ -1513,7 +1513,7 @@ Pointing modes supports multiple pointing devices allowing for either control of
 
 ### Simultaneous device control
 
-When `POINTING_MODES_SINGLE_CONTROL` is not defined and `POINTING_MODES_NUM_DEVICES > 1` simultaneous control of multiple devices is enabled, which is the default behaviour when `SPLIT_POINTING_ENABLE` and `POINTING_DEVICE_COMBINED` are both defined.  This will cause separate tracking of `pointing_mode`s (`.id`, `.x` and `.y`), and `toggle_id`s for each device separately.  All functions under this scheme require setting the desired active device before calling any pointing modes function and the functions will only target that active mode (this also affects builtin keycode macros).  Once set the active device will remain so until changed or the keyboard is powered down so keypresses or functions elsewhere in code will impact the new device once changed.  Changing the active device is made easier through use of the above keycodes (`PMR_CYD`, `PMR_RGHT`, `PMR_LEFT`) so the mode can be set with a keypress and then subsequent `PM_MO` or `PM_TG` keypress will affect the newly active device.
+When `POINTING_MODE_SINGLE_CONTROL` is not defined and `POINTING_MODE_NUM_DEVICES > 1` simultaneous control of multiple devices is enabled, which is the default behaviour when `SPLIT_POINTING_ENABLE` and `POINTING_DEVICE_COMBINED` are both defined.  This will cause separate tracking of `pointing_mode`s (`.id`, `.x` and `.y`), and `toggle_id`s for each device separately.  All functions under this scheme require setting the desired active device before calling any pointing modes function and the functions will only target that active mode (this also affects builtin keycode macros).  Once set the active device will remain so until changed or the keyboard is powered down so keypresses or functions elsewhere in code will impact the new device once changed.  Changing the active device is made easier through use of the above keycodes (`PMR_CYD`, `PMR_RGHT`, `PMR_LEFT`) so the mode can be set with a keypress and then subsequent `PM_MO` or `PM_TG` keypress will affect the newly active device.
 
 !> Note all keycodes/functions for changing `pointing_mode.id` or `toggle_id` will only affect the current active device and the data for all other devices will be unchanged until it is the active device again.
 
@@ -1524,7 +1524,7 @@ The code below is an example of how a hypothetical three device scenario using P
 ```c
 // in keyboard config.h
 #define POINTING_DEVICE_MODES_ENABLE
-#define POINTING_MODES_NUM_DEVICES 3
+#define POINTING_MODE_NUM_DEVICES 3
 
 #define PMW33XX_CS_PINS { <pd_pin_1>, <pd_pin_2>, <pd_pin_3> }
 
@@ -1552,7 +1552,7 @@ void pointing_device_init_kb(void) {
     set_pointing_mode_id(PM_CARET);
     // PD_RIGHT is left as POINTING_MODE_DEFAULT which is PM_NONE if undefined
     // reset default device ID
-    set_pointing_mode_device(POINTING_MODES_DEFAULT_DEVICE_ID);
+    set_pointing_mode_device(POINTING_MODE_DEFAULT_DEVICE_ID);
 
     pointing_device_init_user();
 }
@@ -1587,7 +1587,7 @@ report_mouse_t pointing_device_task_kb(report_mouse_t mouse_report) {
 
 ### Single device control
 
-When `POINTING_MODES_NUM_DEVICES > 1` and `POINTING_MODES_SINGLE_CONTROL` is defined then pointing modes will use the single device control scheme which will only track a single `pointing_mode` (`.id`, `.x` and `.y`), and `toggle_id`, but will be able to switch which device is currently controlled through use of `set_pointing_mode_device` or the .  This handles left and right pointing devices natively when `SPLIT_POINTING_ENABLE` and `POINTING_DEVICE_COMBINED` are both defined but for more than two pointing devices custom `pointing_device_task` code will be needed.
+When `POINTING_MODE_NUM_DEVICES > 1` and `POINTING_MODE_SINGLE_CONTROL` is defined then pointing modes will use the single device control scheme which will only track a single `pointing_mode` (`.id`, `.x` and `.y`), and `toggle_id`, but will be able to switch which device is currently controlled through use of `set_pointing_mode_device` or the .  This handles left and right pointing devices natively when `SPLIT_POINTING_ENABLE` and `POINTING_DEVICE_COMBINED` are both defined but for more than two pointing devices custom `pointing_device_task` code will be needed.
 
 !> Note that the `*_pointing_mode_device` functions do not change any internal behaviour when pointing modes is in single device mode, instead these functions are intended to simply track the desired controlled pointing device (this is handled automatically for two devices with `SPLIT_POINTING_ENABLE` and `POINTING_DEVICE_COMBINED`)
 
