@@ -36,7 +36,7 @@ static uint8_t       selected_device = POINTING_MODE_DEFAULT_DEVICE;
 
 static uint8_t         current_direction = 0;
 static uint8_t         current_divisor   = POINTING_MODE_DEFAULT_DIVISOR;
-static uint8_t         toggle_mode_ids[]      = {[0 ... POINTING_MODE_DEVICE_CONTROL_COUNT - 1] = POINTING_MODE_DEFAULT};
+static uint8_t         toggle_mode_ids[] = {[0 ... POINTING_MODE_DEVICE_CONTROL_COUNT - 1] = POINTING_MODE_DEFAULT};
 static pointing_mode_t pointing_modes[]  = {[0 ... POINTING_MODE_DEVICE_CONTROL_COUNT - 1] = {.mode_id = POINTING_MODE_DEFAULT}};
 
 // set up clamping and divisor application functions

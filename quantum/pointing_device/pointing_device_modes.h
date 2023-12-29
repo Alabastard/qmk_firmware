@@ -118,21 +118,21 @@ void    pointing_mode_set_mode(uint8_t mode_id);    // set current pointing_mode
 void    pointing_mode_toggle_mode(uint8_t mode_id); // toggle pointing mode
 uint8_t pointing_mode_get_mode(void);               // return current pointing_mode.mode_id
 uint8_t pointing_mode_get_toggled_mode(void);       // return current tg_mode_id
-void    pointing_mode_reset_mode(void);                // reset pointing mode to current toggle mode
+void    pointing_mode_reset_mode(void);             // reset pointing mode to current toggle mode
 
 /* ----------Controlling pointing device data conversion---------------------------------------------------------- */
 report_mouse_t pointing_mode_axis_conv(pointing_mode_t pointing_mode, report_mouse_t mouse_report); // converts x & y axes to local h & v
 
 /* ----------Crontrolling pointing mode data---------------------------------------------------------------------- */
 void              pointing_mode_overwrite_current_mode(pointing_mode_t pointing_mode); // overwrite local pointing_mode status
-void              pointing_mode_update(void);                       // update direction & divisor from current mode id, x, y
-mouse_xy_report_t pointing_mode_apply_divisor_xy(int16_t value);                  // divide value by current divisor and clamp to x/y range
-int8_t            pointing_mode_apply_divisor_hv(int16_t value);                  // divide value by current divisor and clamps to h/v range
-int16_t           pointing_mode_multipliy_divisor_xy(mouse_xy_report_t value);     // multiply mouse x/y value by current divisor
-int16_t           pointing_mode_multipliy_divisor_hv(int8_t value);                // multiply mousen h/v value by current divisor
-void              pointing_mode_divisor_override(uint8_t divisor);  // override current divisor
-uint8_t           pointing_mode_get_current_divisor(void);              // return current divisor
-uint8_t           pointing_mode_get_current_direction(void);            // return current direction
+void              pointing_mode_update(void);                                          // update direction & divisor from current mode id, x, y
+mouse_xy_report_t pointing_mode_apply_divisor_xy(int16_t value);                       // divide value by current divisor and clamp to x/y range
+int8_t            pointing_mode_apply_divisor_hv(int16_t value);                       // divide value by current divisor and clamps to h/v range
+int16_t           pointing_mode_multipliy_divisor_xy(mouse_xy_report_t value);         // multiply mouse x/y value by current divisor
+int16_t           pointing_mode_multipliy_divisor_hv(int8_t value);                    // multiply mousen h/v value by current divisor
+void              pointing_mode_divisor_override(uint8_t divisor);                     // override current divisor
+uint8_t           pointing_mode_get_current_divisor(void);                             // return current divisor
+uint8_t           pointing_mode_get_current_direction(void);                           // return current direction
 
 /* ----------For Custom modes without maps---------------------------------------------------------------------- */
 void pointing_mode_tap_codes(uint16_t kc_left, uint16_t kc_down, uint16_t kc_up, uint16_t kc_right); // pointing_mode x/y to keycode taps
