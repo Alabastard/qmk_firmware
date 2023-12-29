@@ -289,6 +289,7 @@ __attribute__((weak)) bool pointing_device_task(void) {
 #endif
     // pointing device modes handling for single pointing device
 #if defined(POINTING_DEVICE_MODES_ENABLE) && !(defined(SPLIT_POINTING_ENABLE) && defined(POINTING_DEVICE_COMBINED))
+    if (pointing_device_driver.get_raw_report_data) pointing_device_modes_task_fetch_raw_data(pointing_device_driver.get_raw_report_data());
     local_mouse_report = pointing_device_modes_task(local_mouse_report);
 #endif
     // combine with mouse report to ensure that the combined is sent correctly

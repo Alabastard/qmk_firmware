@@ -260,9 +260,7 @@ __attribute__((weak)) report_mouse_t pointing_mode_axis_conv(pointing_mode_t poi
     pointing_mode.y += mouse_report.y;
 #    endif
 
-    if ((pointing_mode.mode_id == PM_DPAD) &&
-        (mouse_report.x == 0) &&
-        (mouse_report.y == 0)) {
+    if ((pointing_mode.mode_id == PM_DPAD) && (mouse_report.x == 0) && (mouse_report.y == 0)) {
         pointing_mode_reset_mode();
     } else {
         pointing_mode_overwrite_current_mode(pointing_mode);
@@ -356,9 +354,7 @@ static uint8_t get_pointing_mode_divisor(void) {
  * @return direction uint8_t
  */
 static uint8_t get_pointing_mode_direction(void) {
-    if ((pointing_modes[current_device].x == 0) &&
-        (pointing_modes[current_device].y == 0))
-        return 0;
+    if ((pointing_modes[current_device].x == 0) && (pointing_modes[current_device].y == 0)) return 0;
 
     if (abs(pointing_modes[current_device].x) > abs(pointing_modes[current_device].y)) {
         if (pointing_modes[current_device].x > 0) {
@@ -460,9 +456,9 @@ void pointing_mode_tap_codes(uint16_t kc_left, uint16_t kc_down, uint16_t kc_up,
 }
 
 void pointing_mode_hold_codes(uint16_t kc_left, uint16_t kc_down, uint16_t kc_up, uint16_t kc_right) {
-    pd_dprintf("%s modes: [x%3d, y%3d] \n", __FUNCTION__,
-               pointing_modes[current_device].x,
-               pointing_modes[current_device].y);
+    if (current_direction) {
+        pd_dprintf("%s modes: [x%3d, y%3d] %c%c%c%c \n", __FUNCTION__, pointing_modes[current_device].x, pointing_modes[current_device].y, (current_direction & 1) ? 'L' : '_', (current_direction & 2) ? 'D' : '_', (current_direction & 4) ? 'U' : '_', (current_direction & 8) ? 'R' : '_');
+    }
 }
 
 /**
@@ -507,6 +503,12 @@ static void pointing_exec_mapping(uint8_t map_id) {
     } while (--taps);
 }
 #    endif
+
+void pointing_device_modes_task_fetch_raw_data(pointing_device_raw_data_t raw_report) {
+    /// WIP rough idea would be to fetch the raw data -- before it is down converted to the mouse_reprt_t which is only relative coords in [-127,128]
+    // and "do something" with those raw values. e.g. use the absolute coords to get a "true" direction, or "tap" on a quadrant of the cirque touchpad
+    // ... somewhat abandoned due to it being a shoehorn solution to press the pointing_modes into service; they are designed around relative coords only
+}
 
 /**
  * @brief Core function to handle pointing mode task

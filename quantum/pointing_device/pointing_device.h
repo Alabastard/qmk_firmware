@@ -78,10 +78,17 @@ void           pointing_device_driver_set_cpi(uint16_t cpi);
 #endif
 
 typedef struct {
+    int16_t xValue;
+    int16_t yValue;
+    int16_t wValue;
+} pointing_device_raw_data_t;
+
+typedef struct {
     void (*init)(void);
     report_mouse_t (*get_report)(report_mouse_t mouse_report);
     void (*set_cpi)(uint16_t);
     uint16_t (*get_cpi)(void);
+    pointing_device_raw_data_t(get_report_raw_data)(void);
 } pointing_device_driver_t;
 
 typedef enum {

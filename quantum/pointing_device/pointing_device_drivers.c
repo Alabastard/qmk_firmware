@@ -343,9 +343,10 @@ const pointing_device_driver_t pointing_device_driver = {
     .get_report = cirque_pinnacle_get_report,
     .set_cpi    = cirque_pinnacle_set_cpi,
     .get_cpi    = cirque_pinnacle_get_cpi
+    .get_report_raw_data = cirque_pinnacle_get_report_raw_data
 };
 // clang-format on
-#    else
+#    else  // CIRQUE_PINNACLE_POSITION_MODE
 report_mouse_t cirque_pinnacle_get_report(report_mouse_t mouse_report) {
     pinnacle_data_t touchData = cirque_pinnacle_read_data();
 
@@ -369,7 +370,7 @@ const pointing_device_driver_t pointing_device_driver = {
     .get_cpi    = cirque_pinnacle_get_scale
 };
 // clang-format on
-#    endif
+#    endif // CIRQUE_PINNACLE_POSITION_MODE
 
 #elif defined(POINTING_DEVICE_DRIVER_paw3204)
 
