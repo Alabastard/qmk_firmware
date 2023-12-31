@@ -498,6 +498,33 @@ static void pointing_exec_mapping(uint8_t map_id) {
 }
 #    endif
 
+#    ifdef POINTING_VIRTKEY_MAP_ENABLE
+void pointing_device_modes_keys_task(pd_virtual_key_state_t keystate) {
+    if (pointing_mode_get_mode() != PM_VIRTKEY) {
+        return;
+    }
+
+    // invalid keystate, returned by the sensor in cases it only has invalid data available
+    if (keystate == PD_VIRTKEY_UNDEFINED) return;
+
+    static pd_virtual_key_state_t oldkeystate = 0;
+    if (keystate == oldkeystate) return;
+
+    pd_dprintf("%s keystate=0x%02x %c%c%c%c\n", __FUNCTION__, keystate, (keystate & PD_VIRTKEY_UP) ? 'U' : '_', (keystate & PD_VIRTKEY_DOWN) ? 'D' : '_', (keystate & PD_VIRTKEY_LEFT) ? 'L' : '_', (keystate & PD_VIRTKEY_RIGHT) ? 'R' : '_');
+
+    pd_virtual_key_state_t changes = keystate ^ oldkeystate;
+    oldkeystate                    = keystate;
+
+    pd_virtual_key_state_t col_mask = 1;
+    for (uint8_t col = 0; col < POINTING_VIRTKEY_NUM_KEYS; col++, col_mask <<= 1) {
+        if (changes & col_mask) {
+            const bool key_pressed = keystate & col_mask;
+            action_exec(MAKE_POINTING_VIRTKEY_EVENT(col, key_pressed));
+        }
+    }
+}
+#    endif
+
 /**
  * @brief Core function to handle pointing mode task
  *
@@ -510,6 +537,15 @@ static void pointing_exec_mapping(uint8_t map_id) {
 report_mouse_t pointing_device_modes_task(report_mouse_t mouse_report) {
     // skip all processing if pointing mode is PM_NONE
     if (pointing_mode_get_mode() == PM_NONE) return mouse_report;
+
+#    if defined(POINTING_VIRTKEY_MAP_ENABLE)
+    if (pointing_mode_get_mode() == PM_VIRTKEY) {
+        // zero out the mouse report, as the input position is converted to virtual keypresses
+        mouse_report.x = 0;
+        mouse_report.y = 0;
+        return mouse_report;
+    }
+#    endif
 
     mouse_report = pointing_mode_axis_conv(pointing_modes[current_device], mouse_report);
     pointing_mode_update();
@@ -565,9 +601,11 @@ static report_mouse_t process_pointing_mode(pointing_mode_t pointing_mode, repor
             pointing_mode_tap_codes(KC_LEFT, KC_DOWN, KC_UP, KC_RIGHT);
             break;
 
+#    if defined(POINTING_VIRTKEY_MAP_ENABLE)
         // dpad mode (hold cursor keys in relation to current direction)
-        case PM_DPAD:
+        case PM_VIRTKEY:
             break;
+#    endif
 
         // history scroll mode (will scroll through undo/redo history)
         case PM_HISTORY:

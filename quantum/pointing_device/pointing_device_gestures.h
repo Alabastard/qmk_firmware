@@ -17,6 +17,7 @@
 
 #include <stdint.h>
 #include "report.h"
+#include "pointing_device_virtkey.h"
 
 #ifdef POINTING_DEVICE_GESTURES_CURSOR_GLIDE_ENABLE
 typedef struct {
@@ -55,4 +56,14 @@ cursor_glide_t cursor_glide_start(cursor_glide_context_t* glide);
 
 /* Update glide engine on the latest cursor movement, cursor glide is based on the final movement */
 void cursor_glide_update(cursor_glide_context_t* glide, mouse_xy_report_t dx, mouse_xy_report_t dy, uint16_t z);
+#endif
+
+#ifdef POINTING_VIRTKEY_MAP_ENABLE
+/*
+ * map absolute mouse coordinates to virtual keys, by categorizing the x/y coordinates into segments
+ *
+ * @param abs_report: absolute coordinates, packaged in a mouse report type
+ * @return a bitmask representing the virtual keys pressed
+ */
+pd_virtual_key_state_t pd_derive_virtual_key_state(report_mouse_t abs_report);
 #endif

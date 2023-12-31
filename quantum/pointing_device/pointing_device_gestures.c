@@ -14,6 +14,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <string.h>
+#include <stdlib.h>
+#include "pointing_device.h"
 #include "pointing_device_gestures.h"
 #include "timer.h"
 
@@ -129,5 +131,100 @@ void cursor_glide_update(cursor_glide_context_t* glide, mouse_xy_report_t dx, mo
     status->dx0 = dx;
     status->dy0 = dy;
     status->z   = z;
+}
+#endif
+
+#ifdef POINTING_VIRTKEY_MAP_ENABLE
+pd_virtual_key_state_t pd_derive_virtual_key_state(report_mouse_t abs_report) {
+    report_mouse_t rot = pointing_device_adjust_by_defines(abs_report);
+    const int8_t   x   = rot.x;
+    const int8_t   y   = rot.y;
+
+    if ((x * x + y * y) < POINTING_VIRTKEY_DEADZONE) return PD_VIRTKEY_UNDEFINED;
+
+    /* Note:
+     * x/y are in screen/mouse coordinates, so physical 'up' is along the
+     * negative y, while 'right' is still positive x.
+     */
+
+    if (x == 0) {
+        if (y > 0) {
+            return PD_VIRTKEY_DOWN;
+        } else if (y < 0) {
+            return PD_VIRTKEY_UP;
+        } else {
+            return PD_VIRTKEY_UNDEFINED;
+        }
+    } else if (y == 0) {
+        if (x > 0) {
+            return PD_VIRTKEY_RIGHT;
+        } else if (x < 0) {
+            return PD_VIRTKEY_LEFT;
+        } else {
+            return PD_VIRTKEY_UNDEFINED;
+        }
+
+    } else {
+        // scale [0,128] up, but stay below int16_max
+        int16_t ratio = abs((int16_t)x * 64) / abs(y);
+
+#    if 0
+        /*
+         * quadrant split
+         */
+        if (ratio < 64) {
+            if (y > 0) {
+                return PD_VIRTKEY_DOWN;
+            } else {
+                return PD_VIRTKEY_UP;
+            }
+        } else {
+            if (x > 0) {
+                return PD_VIRTKEY_RIGHT;
+            } else {
+                return PD_VIRTKEY_LEFT;
+            }
+        }
+#    endif
+
+        /*
+         * octant split
+         *
+         * dividing one quadrant into 1+2+1 parts,
+         * compare the 'ratio' to categorize; and look at the signs to figure out which quadrant
+         *
+         *   0--------> X
+         *   |\\-- C
+         *   ||   \- x/y = tan(67.5°) = 2.41421, *64 = 154
+         *   | \ B
+         *   |A \
+         *  Yv    x/y = tan(22.5°) = 0.414214, *64 = 27
+         */
+        if (ratio < 27) { // A
+            if (y > 0) {
+                return PD_VIRTKEY_DOWN;
+            } else {
+                return PD_VIRTKEY_UP;
+            }
+        } else if (ratio < 154) { // B
+            if (x > 0 && y > 0) {
+                return PD_VIRTKEY_DOWN | PD_VIRTKEY_RIGHT;
+            } else if (x < 0 && y > 0) {
+                return PD_VIRTKEY_DOWN | PD_VIRTKEY_LEFT;
+            } else if (x < 0 && y < 0) {
+                return PD_VIRTKEY_UP | PD_VIRTKEY_LEFT;
+            } else if (x > 0 && y < 0) {
+                return PD_VIRTKEY_UP | PD_VIRTKEY_RIGHT;
+            }
+        } else { // C
+            if (x > 0) {
+                return PD_VIRTKEY_RIGHT;
+            } else {
+                return PD_VIRTKEY_LEFT;
+            }
+        }
+
+        return PD_VIRTKEY_UNDEFINED; // should not be reached
+    }
 }
 #endif

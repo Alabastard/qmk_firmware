@@ -19,6 +19,7 @@
 #include <string.h>
 #include "quantum.h"
 #include "pointing_device.h"
+#include "pointing_device_gestures.h"
 
 // default settings
 #ifndef POINTING_MODE_TAP_DELAY
@@ -152,6 +153,10 @@ bool    pointing_mode_divisor_postprocess_user(uint8_t* divisor);           // u
 
 /* ----------Core functions (only used in custom pointing devices or key processing)------------------------------ */
 report_mouse_t pointing_device_modes_task(report_mouse_t mouse_report); // intercepts mouse_report (in pointing_device_task_* stack)
+
+#ifdef POINTING_VIRTKEY_MAP_ENABLE
+void pointing_device_modes_keys_task(pd_virtual_key_state_t keystate);
+#endif
 
 /* ----------Pointing Device mode Mapping------------------------------------------------------------------------- */
 #ifdef POINTING_MODE_MAP_ENABLE

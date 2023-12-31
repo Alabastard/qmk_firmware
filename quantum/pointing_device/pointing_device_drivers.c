@@ -113,6 +113,9 @@ const pointing_device_driver_t pointing_device_driver = {
     .get_report = analog_joystick_get_report,
     .set_cpi    = NULL,
     .get_cpi    = NULL
+#ifdef POINTING_VIRTKEY_MAP_ENABLE
+    .get_virtual_key_state = NULL, //TODO: as "absolute" pointing device, this one could actually map axis deflection to virtual keys
+#endif
 };
 // clang-format on
 
@@ -258,9 +261,14 @@ bool auto_mouse_activation(report_mouse_t mouse_report) {
 }
 #        endif
 
+static pinnacle_data_t touchData = {0};
+bool                   cirque_pinnacle_update_data(void) {
+    touchData = cirque_pinnacle_read_data();
+    return true;
+}
+
 report_mouse_t cirque_pinnacle_get_report(report_mouse_t mouse_report) {
-    uint16_t          scale     = cirque_pinnacle_get_scale();
-    pinnacle_data_t   touchData = cirque_pinnacle_read_data();
+    uint16_t          scale    = cirque_pinnacle_get_scale();
     mouse_xy_report_t report_x = 0, report_y = 0;
     static uint16_t   x = 0, y = 0, last_scale = 0;
 
@@ -336,13 +344,42 @@ uint16_t cirque_pinnacle_get_cpi(void) {
 void cirque_pinnacle_set_cpi(uint16_t cpi) {
     cirque_pinnacle_set_scale(CIRQUE_PINNACLE_INCH_TO_PX(cpi));
 }
+#        ifdef POINTING_VIRTKEY_MAP_ENABLE
+pd_virtual_key_state_t cirque_pinnacle_get_virtual_key_state(void) {
+    uint16_t scale = cirque_pinnacle_get_scale();
+
+#            if !CIRQUE_PINNACLE_POSITION_MODE
+    // relative mode is not really supported
+    return PD_VIRTKEY_UNDEFINED;
+#            endif
+
+    if (!touchData.valid) {
+        return PD_VIRTKEY_UNDEFINED;
+    }
+
+    if (!touchData.touchDown) {
+        return 0;
+    }
+
+    // when a touchDown crosses over the physical edge, the sensor reponds with (0,0)
+    if (touchData.xValue == 0 && touchData.yValue == 0) return PD_VIRTKEY_UNDEFINED;
+
+    report_mouse_t abscoords = {.x = (int8_t)((int32_t)touchData.xValue * INT8_MAX * 2 / scale - INT8_MAX), .y = (int8_t)((int32_t)touchData.yValue * INT8_MAX * 2 / scale - INT8_MAX)};
+
+    return pd_derive_virtual_key_state(abscoords);
+}
+#        endif
 
 // clang-format off
 const pointing_device_driver_t pointing_device_driver = {
     .init       = cirque_pinnacle_init,
+    .update_data = cirque_pinnacle_update_data,
     .get_report = cirque_pinnacle_get_report,
     .set_cpi    = cirque_pinnacle_set_cpi,
-    .get_cpi    = cirque_pinnacle_get_cpi
+    .get_cpi    = cirque_pinnacle_get_cpi,
+#ifdef POINTING_VIRTKEY_MAP_ENABLE
+    .get_virtual_key_state = cirque_pinnacle_get_virtual_key_state,
+#endif
 };
 // clang-format on
 #    else  // CIRQUE_PINNACLE_POSITION_MODE

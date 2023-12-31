@@ -164,3 +164,48 @@ __attribute__((weak)) uint16_t keycode_at_pointing_mode_map_location(uint8_t map
 }
 
 #endif // defined(POINTING_MODE_MAP_ENABLE)
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// pointing device virtual key mapping
+
+#if defined(POINTING_VIRTKEY_MAP_ENABLE)
+
+#    define POINTING_VIRTKEY_MAP_COUNT_RAW (uint8_t)(sizeof(pointing_virtkey_map) / ((POINTING_VIRTKEY_NUM_KEYS) * sizeof(uint16_t)))
+
+uint8_t pointing_virtkey_map_count_raw(void) {
+    return POINTING_VIRTKEY_MAP_COUNT_RAW;
+}
+
+__attribute__((weak)) uint8_t pointing_virtkey_map_count(void) {
+    return pointing_virtkey_map_count_raw();
+}
+
+_Static_assert(NUM_KEYMAP_LAYERS_RAW == POINTING_VIRTKEY_MAP_COUNT_RAW, "Number of pointing_virtkey_map layers doesn't match the number of keymap layers");
+
+/*
+ * @brief Retrieve keycode from pointing device virtual key map
+ *
+ * @param[in] layer_num uint8_t active layer
+ * @param[in] key uint8_t key 'column'
+ *
+ * @return uint16_t keycode at pointing mode map location
+ */
+uint16_t keycode_at_pointing_virtkey_map_location_raw(uint8_t layer_num, uint8_t key) {
+    if (layer_num < POINTING_VIRTKEY_MAP_COUNT_RAW && key < POINTING_VIRTKEY_NUM_KEYS) {
+        return pgm_read_word(&pointing_virtkey_map[layer_num][key]);
+    }
+    return KC_TRNS;
+}
+
+/*
+ * @brief Weakly defined function for retreiving keycode from pointing virtual key map
+ *
+ * @param[in] layer_num uint8_t active layer
+ * @param[in] key uint8_t key 'column'
+ *
+ * @return uint16_t keycode at pointing virtual key map location
+ */
+__attribute__((weak)) uint16_t keycode_at_pointing_virtkey_map_location(uint8_t layer_num, uint8_t key) {
+    return keycode_at_pointing_virtkey_map_location_raw(layer_num, key);
+}
+#endif // POINTING_VIRTKEY_MAP_ENABLE

@@ -212,6 +212,9 @@ extern layer_state_t layer_state;
 #    ifdef POINTING_DEVICE_MODES_ENABLE
 #        include "process_pointing_mode_records.h"
 #    endif
+#    ifdef POINTING_VIRTKEY_MAP_ENABLE
+#        include "pointing_device_virtkey.h"
+#    endif
 #endif
 
 #ifdef MOUSEKEY_ENABLE

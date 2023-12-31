@@ -41,6 +41,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #    include "process_midi.h"
 #endif
 
+#ifdef POINTING_VIRTKEY_MAP_ENABLE
+#    include "pointing_device_virtkey.h"
+#endif
+
 extern keymap_config_t keymap_config;
 
 #include <inttypes.h>
@@ -220,6 +224,12 @@ __attribute__((weak)) uint16_t keymap_key_to_keycode(uint8_t layer, keypos_t key
 #if defined(POINTING_MODE_MAP_ENABLE)
     else if (key.row == KEYLOC_POINTING_MODE && key.col < ((pointing_mode_map_count() << 2) | 0x03)) {
         return keycode_at_pointing_mode_map_location(key.col);
+    }
+#endif // defined(POINTING_MODE_MAP_ENABLE)
+
+#if defined(POINTING_VIRTKEY_MAP_ENABLE)
+    else if (key.row == KEYLOC_POINTING_VIRTKEY && key.col < POINTING_VIRTKEY_NUM_KEYS) {
+        return keycode_at_pointing_virtkey_map_location(layer, key.col);
     }
 #endif // defined(POINTING_MODE_MAP_ENABLE)
 

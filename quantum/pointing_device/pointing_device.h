@@ -71,11 +71,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #    include "drivers/sensors/pmw33xx_common.h"
 #    define POINTING_DEVICE_MOTION_PIN_ACTIVE_LOW
 #else
-void           pointing_device_driver_init(void);
-bool           pointing_device_driver_update_data(void);
-report_mouse_t pointing_device_driver_get_report(report_mouse_t mouse_report);
-uint16_t       pointing_device_driver_get_cpi(void);
-void           pointing_device_driver_set_cpi(uint16_t cpi);
+void                   pointing_device_driver_init(void);
+bool                   pointing_device_driver_update_data(void);
+report_mouse_t         pointing_device_driver_get_report(report_mouse_t mouse_report);
+uint16_t               pointing_device_driver_get_cpi(void);
+void                   pointing_device_driver_set_cpi(uint16_t cpi);
+#    ifdef POINTING_VIRTKEY_MAP_ENABLE
+pd_virtual_key_state_t pointing_device_driver_get_virtual_key_state(void);
+#    endif
 #endif
 
 typedef struct {
@@ -84,6 +87,9 @@ typedef struct {
     report_mouse_t (*get_report)(report_mouse_t mouse_report);
     void (*set_cpi)(uint16_t);
     uint16_t (*get_cpi)(void);
+#ifdef POINTING_VIRTKEY_MAP_ENABLE
+    pd_virtual_key_state_t (*get_virtual_key_state)(void);
+#endif
 } pointing_device_driver_t;
 
 typedef enum {

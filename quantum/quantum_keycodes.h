@@ -230,7 +230,9 @@ enum pointing_device_mode_list {
     PM_PRECISION,
     PM_DRAG,
     PM_CARET,
-    PM_DPAD,
+#if defined(POINTING_VIRTKEY_MAP_ENABLE)
+    PM_VIRTKEY,
+#endif
     PM_HISTORY,
     PM_VOLUME,
     // safe range for custom modes with built in keycodes

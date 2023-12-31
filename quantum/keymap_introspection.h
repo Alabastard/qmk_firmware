@@ -84,3 +84,17 @@ uint16_t keycode_at_pointing_mode_map_location_raw(uint8_t map_loc);
 uint16_t keycode_at_pointing_mode_map_location(uint8_t map_loc);
 
 #endif // defined(POINTING_MODE_MAP_ENABLE)
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// pointing device virtual key mapping
+
+#if defined(POINTING_VIRTKEY_MAP_ENABLE)
+
+uint8_t pointing_virtkey_map_count_raw(void);
+
+uint8_t pointing_virtkey_map_count(void);
+
+uint16_t keycode_at_pointing_virtkey_map_location_raw(uint8_t layer_num, uint8_t key);
+
+uint16_t keycode_at_pointing_virtkey_map_location(uint8_t layer_num, uint8_t key);
+#endif // POINTING_VIRTKEY_MAP_ENABLE
