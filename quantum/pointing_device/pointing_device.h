@@ -72,6 +72,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #    define POINTING_DEVICE_MOTION_PIN_ACTIVE_LOW
 #else
 void           pointing_device_driver_init(void);
+bool           pointing_device_driver_update_data(void);
 report_mouse_t pointing_device_driver_get_report(report_mouse_t mouse_report);
 uint16_t       pointing_device_driver_get_cpi(void);
 void           pointing_device_driver_set_cpi(uint16_t cpi);
@@ -79,6 +80,7 @@ void           pointing_device_driver_set_cpi(uint16_t cpi);
 
 typedef struct {
     void (*init)(void);
+    bool (*update_data)(void);
     report_mouse_t (*get_report)(report_mouse_t mouse_report);
     void (*set_cpi)(uint16_t);
     uint16_t (*get_cpi)(void);

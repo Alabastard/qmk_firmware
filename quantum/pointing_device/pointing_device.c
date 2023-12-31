@@ -255,6 +255,13 @@ __attribute__((weak)) bool pointing_device_task(void) {
     {
 #endif
 
+        // if 'get_report' does not do the data aquisition itself
+        if (pointing_device_driver.update_data)
+            if (!pointing_device_driver.update_data()) {
+                // the update procedure can detect if there has been any change, and if not can skip the mouse-report sending
+                return false;
+            }
+
 #if defined(SPLIT_POINTING_ENABLE)
 #    if defined(POINTING_DEVICE_COMBINED)
         static uint8_t old_buttons = 0;

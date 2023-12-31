@@ -27,6 +27,7 @@
 #define CONSTRAIN_HID_XY(amt) ((amt) < XY_REPORT_MIN ? XY_REPORT_MIN : ((amt) > XY_REPORT_MAX ? XY_REPORT_MAX : (amt)))
 
 // get_report functions should probably be moved to their respective drivers.
+// should they? the drivers only concerned with providing data, the pointin_device_* does the conversion to mouse_reports
 
 #if defined(POINTING_DEVICE_DRIVER_adns5050)
 report_mouse_t adns5050_get_report(report_mouse_t mouse_report) {
@@ -493,7 +494,10 @@ const pointing_device_driver_t pointing_device_driver = {
 // clang-format on
 
 #else
-__attribute__((weak)) void           pointing_device_driver_init(void) {}
+__attribute__((weak)) void pointing_device_driver_init(void) {}
+__attribute__((weak)) bool pointing_device_driver_update(void) {
+    return false;
+}
 __attribute__((weak)) report_mouse_t pointing_device_driver_get_report(report_mouse_t mouse_report) {
     return mouse_report;
 }
