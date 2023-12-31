@@ -343,27 +343,3 @@ pinnacle_data_t cirque_pinnacle_read_data(void) {
     result.valid = true;
     return result;
 }
-
-pointing_device_raw_data_t cirque_pinnacle_get_report_raw_data() {
-    // TODO: not good: sensor is queried twice, once for the "normal" mouse_report, than a second time if this fucntion is called... consider storing raw values in static/global? which would break kinda the driver design?
-    uint16_t        scale     = cirque_pinnacle_get_scale();
-    pinnacle_data_t touchData = cirque_pinnacle_read_data();
-
-    cirque_pinnacle_scale_data(&touchData, cirque_pinnacle_get_scale(), cirque_pinnacle_get_scale());
-    // absolute coords, uint, in [0,1024] = [0,scale]
-
-    if (touchData.valid) {
-        /*
-         * Place origin at center of trackpad, treat coordinates as vectors.
-         * Scale to +/-INT8_MAX; angles are independent of resolution.
-         * /
-        if (scale) {
-            / * Rotate coordinates into a consistent orientation
-            report_mouse_t rot = {.x = (int8_t)((int32_t)touchData.xValue * INT8_MAX * 2 / scale - center), .y = (int8_t)((int32_t)touchData.yValue * INT8_MAX * 2 / scale - center)};
-            */
-
-        return = {.xValue = touchData.xValue, .yValue = touchData.yValue, .wValue = touchData.zValue};
-    } else {
-        return {0};
-    }
-}

@@ -326,7 +326,6 @@ mouse_report_update:
     mouse_report.x = report_x;
     mouse_report.y = report_y;
 
-    pd_dprintf("%s [%3d, %3d] \n", __FUNCTION__, mouse_report.x, mouse_report.y);
     return mouse_report;
 }
 
@@ -343,7 +342,6 @@ const pointing_device_driver_t pointing_device_driver = {
     .get_report = cirque_pinnacle_get_report,
     .set_cpi    = cirque_pinnacle_set_cpi,
     .get_cpi    = cirque_pinnacle_get_cpi
-    .get_report_raw_data = cirque_pinnacle_get_report_raw_data
 };
 // clang-format on
 #    else  // CIRQUE_PINNACLE_POSITION_MODE

@@ -260,12 +260,6 @@ __attribute__((weak)) report_mouse_t pointing_mode_axis_conv(pointing_mode_t poi
     pointing_mode.y += mouse_report.y;
 #    endif
 
-    if ((pointing_mode.mode_id == PM_DPAD) && (mouse_report.x == 0) && (mouse_report.y == 0)) {
-        pointing_mode_reset_mode();
-    } else {
-        pointing_mode_overwrite_current_mode(pointing_mode);
-    }
-
     mouse_report.x = 0;
     mouse_report.y = 0;
     return mouse_report;
@@ -504,12 +498,6 @@ static void pointing_exec_mapping(uint8_t map_id) {
 }
 #    endif
 
-void pointing_device_modes_task_fetch_raw_data(pointing_device_raw_data_t raw_report) {
-    /// WIP rough idea would be to fetch the raw data -- before it is down converted to the mouse_reprt_t which is only relative coords in [-127,128]
-    // and "do something" with those raw values. e.g. use the absolute coords to get a "true" direction, or "tap" on a quadrant of the cirque touchpad
-    // ... somewhat abandoned due to it being a shoehorn solution to press the pointing_modes into service; they are designed around relative coords only
-}
-
 /**
  * @brief Core function to handle pointing mode task
  *
@@ -579,7 +567,6 @@ static report_mouse_t process_pointing_mode(pointing_mode_t pointing_mode, repor
 
         // dpad mode (hold cursor keys in relation to current direction)
         case PM_DPAD:
-            pointing_mode_hold_codes(KC_LEFT, KC_DOWN, KC_UP, KC_RIGHT);
             break;
 
         // history scroll mode (will scroll through undo/redo history)
