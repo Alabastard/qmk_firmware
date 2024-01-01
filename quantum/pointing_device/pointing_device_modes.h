@@ -107,13 +107,6 @@ enum pointing_mode_devices {
 #endif
 };
 
-/* local data structures */
-typedef struct {
-    uint8_t mode_id;
-    int16_t x;
-    int16_t y;
-} pointing_mode_t;
-
 /* ----------Controlling pointing device modes-------------------------------------------------------------------- */
 void    pointing_mode_set_mode(uint8_t mode_id);    // set current pointing_mode.mode_id to mode_id
 void    pointing_mode_toggle_mode(uint8_t mode_id); // toggle pointing mode
@@ -122,19 +115,18 @@ uint8_t pointing_mode_get_toggled_mode(void);       // return current tg_mode_id
 void    pointing_mode_reset_mode(void);             // reset pointing mode to current toggle mode
 
 /* ----------Crontrolling pointing mode data---------------------------------------------------------------------- */
-void              pointing_mode_overwrite_current_mode(pointing_mode_t pointing_mode); // overwrite local pointing_mode status
-mouse_xy_report_t pointing_mode_apply_divisor_xy(int16_t value);                       // divide value by current divisor and clamp to x/y range
-int8_t            pointing_mode_apply_divisor_hv(int16_t value);                       // divide value by current divisor and clamps to h/v range
-void              pointing_mode_divisor_override(uint8_t divisor);                     // override current divisor
-uint8_t           pointing_mode_get_current_divisor(void);                             // return current divisor
-uint8_t           pointing_mode_get_current_direction(void);                           // return current direction
+mouse_xy_report_t pointing_mode_apply_divisor_xy(int16_t value);   // divide value by current divisor and clamp to x/y range
+int8_t            pointing_mode_apply_divisor_hv(int16_t value);   // divide value by current divisor and clamps to h/v range
+void              pointing_mode_divisor_override(uint8_t divisor); // override current divisor
+uint8_t           pointing_mode_get_current_divisor(void);         // return current divisor
+uint8_t           pointing_mode_get_current_direction(void);       // return current direction
 
 /* ----------For Custom modes without maps---------------------------------------------------------------------- */
-void pointing_mode_tap_codes(uint16_t kc_left, uint16_t kc_down, uint16_t kc_up, uint16_t kc_right); // pointing_mode x/y to keycode taps
+void pointing_mode_tap_codes(report_mouse_t mouse_report, uint16_t kc_left, uint16_t kc_down, uint16_t kc_up, uint16_t kc_right); // pointing_mode x/y to keycode taps
 
 /* ----------Callbacks for modifying and adding pointing modes---------------------------------------------------- */
-bool pointing_mode_process_kb(pointing_mode_t pointing_mode, report_mouse_t* mouse_report);   // keyboard level
-bool pointing_mode_process_user(pointing_mode_t pointing_mode, report_mouse_t* mouse_report); // user/keymap level
+bool pointing_mode_process_kb(report_mouse_t* mouse_report);   // keyboard level
+bool pointing_mode_process_user(report_mouse_t* mouse_report); // user/keymap level
 
 /* ----------Callbacks for adding/modifying pointing device mode divisors----------------------------------------- */
 uint8_t pointing_mode_get_divisor_kb(uint8_t mode_id, uint8_t direction);   // adding new divisors at keyboard level
