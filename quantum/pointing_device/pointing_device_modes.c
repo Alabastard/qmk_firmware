@@ -210,31 +210,6 @@ void pointing_mode_toggle_mode(uint8_t mode_id) {
 }
 
 /**
- * @brief Weak function to convert x/y axes to h/v
- *
- * The default uses accumulation based on inversion defines and
- * halts cursor movement
- *
- * @params pointing_modes[in] pointing_mode_t
- * @params mouse_report[in]  report_mouse_t
- *
- * @return updated mouse_report report_mouse_t
- */
-__attribute__((weak)) report_mouse_t pointing_mode_axis_conv(pointing_mode_t pointing_mode, report_mouse_t mouse_report) {
-    pointing_mode.x += mouse_report.x;
-    pointing_mode.y += mouse_report.y;
-
-    // bad function with sideeffects...
-    pointing_mode_overwrite_current_mode(pointing_mode);
-
-    pd_dprintf("%s:%i mouse_report[%3d,%3d]->pointing_mode[%3d,%3d]\n", __FUNCTION__, __LINE__, mouse_report.x, mouse_report.y, pointing_mode.x, pointing_mode.y);
-
-    mouse_report.x = 0;
-    mouse_report.y = 0;
-    return mouse_report;
-}
-
-/**
  * @brief Modifies divisor after
  *
  * @params pointing_modes[in] uint8_t
@@ -335,17 +310,6 @@ static uint8_t get_pointing_mode_direction(void) {
             return PD_UP;
         }
     }
-}
-
-/**
- * @brief update dependent parameters of pointing_mode
- *
- * Will update the direction and divisor values based on mode id and h, and v axis values
- *
- */
-void pointing_mode_update(void) {
-    current_direction = get_pointing_mode_direction();
-    current_divisor   = get_pointing_mode_divisor();
 }
 
 /**
@@ -503,7 +467,7 @@ void pointing_device_modes_keys_task(pd_virtual_key_state_t keystate) {
 report_mouse_t pointing_device_modes_task(report_mouse_t mouse_report) {
     // skip all processing if pointing mode is PM_NONE
     if (pointing_mode_get_mode() == PM_NONE) return mouse_report;
-    if (mouse_report.x == 0 && mouse_report.y==0) return mouse_report;
+    if (mouse_report.x == 0 && mouse_report.y == 0) return mouse_report;
 
 #    if defined(POINTING_VIRTKEY_MAP_ENABLE)
     if (pointing_mode_get_mode() == PM_VIRTKEY) {
@@ -514,8 +478,17 @@ report_mouse_t pointing_device_modes_task(report_mouse_t mouse_report) {
     }
 #    endif
 
-    mouse_report = pointing_mode_axis_conv(pointing_modes[current_device], mouse_report);
-    pointing_mode_update();
+    pointing_modes[current_device].x += mouse_report.x;
+    pointing_modes[current_device].y += mouse_report.y;
+
+    pd_dprintf("%s:%i mouse_report[%3d,%3d]->pointing_mode[%3d,%3d]\n", __FUNCTION__, __LINE__, mouse_report.x, mouse_report.y, pointing_modes[current_device].x, pointing_modes[current_device].y);
+
+    mouse_report.x = 0;
+    mouse_report.y = 0;
+
+    current_direction = get_pointing_mode_direction();
+    current_divisor   = get_pointing_mode_divisor();
+
     mouse_report = process_pointing_mode(pointing_modes[current_device], mouse_report);
 
     return mouse_report;

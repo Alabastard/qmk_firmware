@@ -121,12 +121,8 @@ uint8_t pointing_mode_get_mode(void);               // return current pointing_m
 uint8_t pointing_mode_get_toggled_mode(void);       // return current tg_mode_id
 void    pointing_mode_reset_mode(void);             // reset pointing mode to current toggle mode
 
-/* ----------Controlling pointing device data conversion---------------------------------------------------------- */
-report_mouse_t pointing_mode_axis_conv(pointing_mode_t pointing_mode, report_mouse_t mouse_report); // converts x & y axes to local h & v
-
 /* ----------Crontrolling pointing mode data---------------------------------------------------------------------- */
 void              pointing_mode_overwrite_current_mode(pointing_mode_t pointing_mode); // overwrite local pointing_mode status
-void              pointing_mode_update(void);                                          // update direction & divisor from current mode id, x, y
 mouse_xy_report_t pointing_mode_apply_divisor_xy(int16_t value);                       // divide value by current divisor and clamp to x/y range
 int8_t            pointing_mode_apply_divisor_hv(int16_t value);                       // divide value by current divisor and clamps to h/v range
 void              pointing_mode_divisor_override(uint8_t divisor);                     // override current divisor
