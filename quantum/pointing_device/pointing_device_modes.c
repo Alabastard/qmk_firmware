@@ -249,16 +249,8 @@ void pointing_mode_toggle_mode(uint8_t mode_id) {
  * @return updated mouse_report report_mouse_t
  */
 __attribute__((weak)) report_mouse_t pointing_mode_axis_conv(pointing_mode_t pointing_mode, report_mouse_t mouse_report) {
-#    ifdef POINTING_DEVICE_MODES_INVERT_X
-    pointing_mode.x -= mouse_report.x;
-#    else
     pointing_mode.x += mouse_report.x;
-#    endif
-#    ifdef POINTING_DEVICE_MODES_INVERT_Y
-    pointing_mode.y -= mouse_report.y;
-#    else
     pointing_mode.y += mouse_report.y;
-#    endif
 
     // bad function with sideeffects...
     pointing_mode_overwrite_current_mode(pointing_mode);
@@ -572,20 +564,10 @@ static report_mouse_t process_pointing_mode(pointing_mode_t pointing_mode, repor
     switch (pointing_mode.mode_id) {
         // precision mode  (reduce x y sensitivity temporarily)
         case PM_PRECISION:
-#    ifdef POINTING_MODE_DEVICE_MODES_INVERT_X
-            mouse_report.x -= pointing_mode_apply_divisor_xy(pointing_mode.x);
-            pointing_mode.x += pointing_mode_multipliy_divisor_xy(mouse_report.x);
-#    else
             mouse_report.x += pointing_mode_apply_divisor_xy(pointing_mode.x);
             pointing_mode.x -= pointing_mode_multipliy_divisor_xy(mouse_report.x);
-#    endif
-#    ifdef POINTING_MODE_DEVICE_MODES_INVERT_Y
-            mouse_report.y -= pointing_mode_apply_divisor_xy(pointing_mode.y);
-            pointing_mode.y += pointing_mode_multipliy_divisor_xy(mouse_report.y);
-#    else
             mouse_report.y += pointing_mode_apply_divisor_xy(pointing_mode.y);
             pointing_mode.y -= pointing_mode_multipliy_divisor_xy(mouse_report.y);
-#    endif
             pointing_mode_overwrite_current_mode(pointing_mode);
             break;
 

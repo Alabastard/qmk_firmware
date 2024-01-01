@@ -985,8 +985,6 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 | Define                           | Description                                                                                        |  Range  |     Units    |                        Default |
 | -------------------------------- | ----------------------------------------------------------------------------------------- | :-----: | :----------: | -----------------------: |
 | `POINTING_DEVICE_MODES_ENABLE`   | (Required) Enables pointing device pointing device modes feature                          |  `NA`   |    `None`    |            _Not defined_ |
-| `POINTING_DEVICE_MODES_INVERT_X` | (optional) Inverts stored y axis accumulation (affects all modes)                         |  `NA`   |    `None`    |            _Not defined_ |
-| `POINTING_DEVICE_MODES_INVERT_Y` | (optional) Inverts stored x axis accumulation (affects all modes)                         |  `NA`   |    `None`    |            _Not defined_ |
 | `POINTING_MODE_DEFAULT`          | (optional) Default pointing device mode                                                   | `0-255` |    `None`    |                `PM_NONE` |
 | `POINTING_MODE_TAP_DELAY`             | (optional) Delay between key presses in `pointing_mode_tap_codes` in ms                        | `0-255` |     `ms`     |         `TAP_CODE_DELAY` |
 | `POINTING_MODE_MAP_ENABLE`       | (optional) Enable use of pointing mode maps                                               |  `NA`   |    `None`    |            _Not defined_ |
@@ -1422,20 +1420,12 @@ bool pointing_mode_process_kb(pointing_mode_t pointing_mode, report_mouse_t* mou
             {
                 // add linear boost to cursor x speed
                 mouse_xy_report_t temp_mouse_axis = pointing_mode_apply_divisor_xy(pointing_mode.x);
-#ifdef POINTING_MODE_DEVICE_INVERT_H
-                mouse_report->x = CONSTRAIN_XY(mouse_report->x - temp_mouse_axis);
-#else
                 mouse_report->x = CONSTRAIN_XY(mouse_report->x + temp_mouse_axis);
-#endif
                 // collect residual
                 pointing_mode.x -= pointing_mode_multipliy_divisor_xy(temp_mouse_axis);
                 // add linear boost to cursor y speed
                 temp_mouse_axis = pointing_mode_apply_divisor_xy(pointing_mode.y);
-#ifdef POINTING_MODE_DEVICE_INVERT_V
-                mouse_report->y = CONSTRAIN_XY(mouse_report->y - pointing_mode_apply_divisor_xy(pointing_mode.y));
-#else
                 mouse_report->y = CONSTRAIN_XY(mouse_report->y + pointing_mode_apply_divisor_xy(pointing_mode.y));
-#endif
                 // collect residual
                 pointing_mode.y -= pointing_mode_multipliy_divisor_xy(temp_mouse_axis);
             }
@@ -1478,8 +1468,6 @@ bool process_record_kb(uint16_t keycode, keyrecord_t* record) {
 }
 
 ```
-
-!> Note that in the above code example there needed to be some additional handling of `POINTING_MODE_DEVICE_INVERT_V` and `POINTING_MODE_DEVICE_INVERT_H` when modifying cursor movement specifically as these may not work as expected if either of these options is defined.
 
 ## Multiple Pointing Devices
 
