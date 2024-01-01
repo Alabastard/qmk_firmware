@@ -350,6 +350,9 @@ static uint8_t get_pointing_mode_divisor(void) {
  *
  * Determines direction based on axis with largest magnitude
  *
+ * Note: mouse_reports hold relative coordinates in the screen coordinate system:
+ * x is left-to-right, but y is top-to-bottom; e.g. 'up' is along the negative y
+ *
  * @return direction uint8_t
  */
 static uint8_t get_pointing_mode_direction(void) {
@@ -363,9 +366,9 @@ static uint8_t get_pointing_mode_direction(void) {
         }
     } else {
         if (pointing_modes[current_device].y > 0) {
-            return PD_UP;
-        } else {
             return PD_DOWN;
+        } else {
+            return PD_UP;
         }
     }
 }
