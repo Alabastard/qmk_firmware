@@ -503,6 +503,7 @@ void pointing_device_modes_keys_task(pd_virtual_key_state_t keystate) {
 report_mouse_t pointing_device_modes_task(report_mouse_t mouse_report) {
     // skip all processing if pointing mode is PM_NONE
     if (pointing_mode_get_mode() == PM_NONE) return mouse_report;
+    if (mouse_report.x == 0 && mouse_report.y==0) return mouse_report;
 
 #    if defined(POINTING_VIRTKEY_MAP_ENABLE)
     if (pointing_mode_get_mode() == PM_VIRTKEY) {
