@@ -454,12 +454,6 @@ void pointing_mode_tap_codes(uint16_t kc_left, uint16_t kc_down, uint16_t kc_up,
     pointing_tap_keycodes_raw(pm_keycodes);
 }
 
-void pointing_mode_hold_codes(uint16_t kc_left, uint16_t kc_down, uint16_t kc_up, uint16_t kc_right) {
-    if (current_direction) {
-        pd_dprintf("%s modes: [x%3d, y%3d] %c%c%c%c \n", __FUNCTION__, pointing_modes[current_device].x, pointing_modes[current_device].y, (current_direction & 1) ? 'L' : '_', (current_direction & 2) ? 'D' : '_', (current_direction & 4) ? 'U' : '_', (current_direction & 8) ? 'R' : '_');
-    }
-}
-
 /**
  * @brief Tap keycodes from pointing mode maps
  *
