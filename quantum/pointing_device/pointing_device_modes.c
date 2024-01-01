@@ -547,7 +547,7 @@ static report_mouse_t process_pointing_mode(pointing_mode_t pointing_mode, repor
         case PM_DRAG:
             mouse_report.h = pointing_mode_apply_divisor_hv(pointing_mode.x);
             pointing_mode.x = 0;
-            mouse_report.v = pointing_mode_apply_divisor_hv(pointing_mode.y);
+            mouse_report.v = -pointing_mode_apply_divisor_hv(pointing_mode.y);
             pointing_mode.y = 0;
             pointing_mode_overwrite_current_mode(pointing_mode);
             break;
