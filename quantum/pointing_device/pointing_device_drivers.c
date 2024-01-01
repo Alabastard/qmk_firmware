@@ -262,6 +262,7 @@ bool auto_mouse_activation(report_mouse_t mouse_report) {
 #        endif
 
 static pinnacle_data_t touchData = {0};
+
 bool                   cirque_pinnacle_update_data(void) {
     touchData = cirque_pinnacle_read_data();
     return true;

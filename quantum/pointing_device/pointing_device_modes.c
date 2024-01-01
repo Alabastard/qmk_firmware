@@ -260,6 +260,11 @@ __attribute__((weak)) report_mouse_t pointing_mode_axis_conv(pointing_mode_t poi
     pointing_mode.y += mouse_report.y;
 #    endif
 
+    // bad function with sideeffects...
+    pointing_mode_overwrite_current_mode(pointing_mode);
+
+    pd_dprintf("%s:%i mouse_report[%3d,%3d]->pointing_mode[%3d,%3d]\n", __FUNCTION__, __LINE__, mouse_report.x, mouse_report.y, pointing_mode.x, pointing_mode.y);
+
     mouse_report.x = 0;
     mouse_report.y = 0;
     return mouse_report;
