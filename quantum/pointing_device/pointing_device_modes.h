@@ -129,8 +129,6 @@ void              pointing_mode_overwrite_current_mode(pointing_mode_t pointing_
 void              pointing_mode_update(void);                                          // update direction & divisor from current mode id, x, y
 mouse_xy_report_t pointing_mode_apply_divisor_xy(int16_t value);                       // divide value by current divisor and clamp to x/y range
 int8_t            pointing_mode_apply_divisor_hv(int16_t value);                       // divide value by current divisor and clamps to h/v range
-int16_t           pointing_mode_multipliy_divisor_xy(mouse_xy_report_t value);         // multiply mouse x/y value by current divisor
-int16_t           pointing_mode_multipliy_divisor_hv(int8_t value);                    // multiply mousen h/v value by current divisor
 void              pointing_mode_divisor_override(uint8_t divisor);                     // override current divisor
 uint8_t           pointing_mode_get_current_divisor(void);                             // return current divisor
 uint8_t           pointing_mode_get_current_direction(void);                           // return current direction

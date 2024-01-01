@@ -108,34 +108,6 @@ int8_t pointing_mode_apply_divisor_hv(int16_t value) {
 }
 
 /**
- * @brief multiplies mouse x/y value by current divisor
- *
- * Intended for collecting residuals by subtracting quotient * divisor from the dividend
- * as modulo can be large and slow on some chips
- *
- * @params value[in] value mouse_xy_report_t mouse x/y axis value to multiply
- *
- * @return product clamped to int16_t range
- */
-int16_t pointing_mode_multipliy_divisor_xy(mouse_xy_report_t value) {
-    return divisor_multiply16((int16_t)value);
-}
-
-/**
- * @brief multiplies mouse h/v value by current divisor
- *
- * Intended for collecting residuals by subtracting quotient * divisor from the dividend
- * as modulo can be large and slow on some chips
- *
- * @params value[in] value int8_t mouse h/v axis value to multiply
- *
- * @return modified and clamped value int16_t
- */
-int16_t pointing_mode_multipliy_divisor_hv(int8_t value) {
-    return divisor_multiply16((int16_t)value);
-}
-
-/**
  * @brief Return device id of current controlled device
  *
  * @return current device id [uint8_t]
@@ -565,18 +537,18 @@ static report_mouse_t process_pointing_mode(pointing_mode_t pointing_mode, repor
         // precision mode  (reduce x y sensitivity temporarily)
         case PM_PRECISION:
             mouse_report.x += pointing_mode_apply_divisor_xy(pointing_mode.x);
-            pointing_mode.x -= pointing_mode_multipliy_divisor_xy(mouse_report.x);
+            pointing_mode.x = 0;
             mouse_report.y += pointing_mode_apply_divisor_xy(pointing_mode.y);
-            pointing_mode.y -= pointing_mode_multipliy_divisor_xy(mouse_report.y);
+            pointing_mode.y = 0;
             pointing_mode_overwrite_current_mode(pointing_mode);
             break;
 
         // drag scroll mode (sets mouse axes to mouse_report h & v with divisor)
         case PM_DRAG:
             mouse_report.h = pointing_mode_apply_divisor_hv(pointing_mode.x);
-            pointing_mode.x -= pointing_mode_multipliy_divisor_hv(mouse_report.h);
+            pointing_mode.x = 0;
             mouse_report.v = pointing_mode_apply_divisor_hv(pointing_mode.y);
-            pointing_mode.y -= pointing_mode_multipliy_divisor_hv(mouse_report.v);
+            pointing_mode.y = 0;
             pointing_mode_overwrite_current_mode(pointing_mode);
             break;
 
